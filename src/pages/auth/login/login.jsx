@@ -28,48 +28,61 @@ const Login = () => {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = (e) => {
-    // 여기에 로그인 로직을 추가하세요
-    console.log('로그인 시도:', formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // 예시: 간단한 유효성 검사
     if (!formData.userName || !formData.userPassword) {
       alert('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
-    
-    // 실제 로그인 API 호출 코드가 들어갈 자리
-    // 성공시 메인 페이지로 이동
-    // navigate('/');
+
+    try { // fetch는 나중에 링크 수정
+      const response = await fetch('/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('로그인 실패');
+      }
+
+      const data = await response.json();
+    } catch (error) {
+      console.error('로그인 에러:', error);
+      alert('비밀번호 또는 아이디가 일치하지 않습니다.');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('토큰이 존재하지 않습니다.');
+      return;
+    }
+    navigate('/mypage'); // 마이페이지 만들면 거기로 이동
   };
 
-  // 뒤로가기
   const handleGoBack = () => {
     navigate(-1);
   };
 
-  // 회원가입 페이지로 이동
   const handleSignUp = () => {
     navigate('/auth/signup');
   };
 
-  // 소셜 로그인 핸들러들
   const handleKakaoLogin = () => {
-    console.log('카카오 로그인');
-    // 카카오 로그인 로직
+    console.log('카카오 로그인 구현중');
   };
 
   const handleNaverLogin = () => {
-    console.log('네이버 로그인');
-    // 네이버 로그인 로직
+    console.log('네이버 로그인 구현중');
   };
 
   const handleAppleLogin = () => {
-    console.log('애플 로그인');
-    // 애플 로그인 로직
+    console.log('애플 로그인 구현중');
   };
 
-  // 비밀번호 표시/숨김 토글
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -77,7 +90,6 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-wrapper">
-        {/* 헤더 영역 */}
         <div className="header">
           <button
             className="back-btn"
@@ -94,11 +106,9 @@ const Login = () => {
           />
         </div>
 
-        {/* 제목 영역 */}
         <h2>함께 하는 경산 루트</h2>
         <h3>서비스 이용을 위해 로그인해주세요</h3>
 
-        {/* 로그인 폼 */}
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="userName" className="form-label">
@@ -109,7 +119,7 @@ const Login = () => {
               id="userName"
               name="userName"
               className="form-input"
-              placeholder="아이디, 혹은 휴대폰 번호 입력"
+              placeholder="아이디, 혹은 휴대폰 번호 입력" // 일단 디자인이 이렇게 나와서 이렇게 함
               value={formData.userName}
               onChange={handleInputChange}
             />
@@ -150,7 +160,6 @@ const Login = () => {
             Login
           </button>
 
-          {/* 링크 영역 */}
           <div className="links">
             <button
               type="button"
@@ -170,10 +179,8 @@ const Login = () => {
             <a href="/user/find-password">ID/PW찾기</a>
           </div>
 
-          {/* 구분선 */}
           <hr className="divider" />
 
-          {/* 소셜 로그인 */}
           <div className="social-login" aria-label="소셜 로그인">
             <img
               src={kakaoLogo}
