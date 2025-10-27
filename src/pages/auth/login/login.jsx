@@ -147,7 +147,7 @@ const Login = () => {
                 aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
               >
                 <img
-                  src={showPassword ? eyeOff : eyeOpen}
+                  src={showPassword ? eyeOpen : eyeOff}
                   alt="toggle password visibility"
                   className="eye-icon"
                   draggable={false}

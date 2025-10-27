@@ -205,13 +205,11 @@
 	box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
-/* 필수 항목 표시 */
 .required-mark {
 	color: #ef4444;
 	margin-left: 2px;
 }
 
-/* 추천인 입력 필드 */
 .referral-container {
 	display: flex;
 	flex-direction: column;
@@ -224,7 +222,6 @@
 	color: var(--muted);
 }
 
-/* 환영 메시지 페이지 */
 .welcome-container {
 	display: flex;
 	flex-direction: column;
@@ -275,7 +272,6 @@
 	background: var(--primary-hover);
 }
 
-/* 비밀번호 표시/숨김 토글 */
 .password-toggle {
 	position: absolute;
 	right: 8px;

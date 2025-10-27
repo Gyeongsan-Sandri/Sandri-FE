@@ -25,7 +25,6 @@ const Signup = () => {
     referralId: ''
   });
 
-  // 입력값 변경 핸들러
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -34,7 +33,6 @@ const Signup = () => {
     }));
   };
 
-  // 뒤로가기
   const handleGoBack = () => {
     if (currentStep === 1) {
       navigate('/auth/login');
@@ -43,26 +41,22 @@ const Signup = () => {
     }
   };
 
-  // 다음 단계
   const handleNext = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  // 회원가입 완료
   const handleSignupComplete = () => {
     console.log('회원가입 완료:', formData);
     // 실제 회원가입 API 호출
     setCurrentStep(3); // 환영 페이지로
   };
 
-  // 서비스 시작
   const handleStartService = () => {
     navigate('/auth/login');
   };
 
-  // 비밀번호 토글
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -71,7 +65,6 @@ const Signup = () => {
     setShowPasswordConfirm(!showPasswordConfirm);
   };
 
-  // 1단계: 기본 정보
   const renderStep1 = () => (
     <>
       <h2>함께 하는 경산 루트</h2>
@@ -178,7 +171,6 @@ const Signup = () => {
     </>
   );
 
-  // 2단계: 추가 정보
   const renderStep2 = () => (
     <>
       <h2>함께 하는 경산 루트</h2>
@@ -279,7 +271,6 @@ const Signup = () => {
     </>
   );
 
-  // 3단계: 환영 메시지
   const renderStep3 = () => (
     <div className="welcome-container">
       <h1 className="welcome-title">{formData.name}님 환영합니다!</h1>
