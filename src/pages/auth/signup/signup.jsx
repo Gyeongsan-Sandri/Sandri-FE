@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './signup.css';
-
-// assets 폴더에서 이미지들을 import
 import sandriLogo from '../../../assets/sandri_logo.svg';
 import eyeOpen from '../../../assets/eye.svg';
 import eyeOff from '../../../assets/eye-off.svg';
+import backIcon from '../../../assets/back_icon.svg';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -25,16 +24,37 @@ const Signup = () => {
     referralId: ''
   });
 
-  // 입력값 변경 핸들러
+  const [birthInputs, setBirthInputs] = useState({
+    birthDate: '',
+    genderNum: ''
+  });
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 뒤로가기
+  const handleBirthInputChange = (field, value) => {
+    if (!/^\d*$/.test(value)) return;
+
+    if (field === 'birthDate') {
+      if (value.length > 6) return;
+      setBirthInputs(prev => ({ ...prev, birthDate: value }));
+      
+      if (value.length === 6) {
+        setFormData(prev => ({ ...prev, birthDate: `20${value}` }));
+      }
+    } else if (field === 'genderNum') {
+      if (value.length > 1) return;
+      setBirthInputs(prev => ({ ...prev, genderNum: value }));
+      
+      if (value) {
+        const genderValue = ['1', '3'].includes(value) ? 'M' : ['2', '4'].includes(value) ? 'F' : '';
+        setFormData(prev => ({ ...prev, gender: genderValue }));
+      }
+    }
+  };
+
   const handleGoBack = () => {
     if (currentStep === 1) {
       navigate('/auth/login');
@@ -43,26 +63,92 @@ const Signup = () => {
     }
   };
 
-  // 다음 단계
   const handleNext = () => {
+    if (!formData.name || !formData.userId || !formData.password || !formData.passwordConfirm) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    if (formData.password !== formData.passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  // 회원가입 완료
-  const handleSignupComplete = () => {
-    console.log('회원가입 완료:', formData);
-    // 실제 회원가입 API 호출
-    setCurrentStep(3); // 환영 페이지로
+  const handleSignupComplete = async () => {
+    if (!formData.nickname || !formData.birthDate || !formData.gender || !formData.location) {
+      alert('필수 입력 항목을 모두 입력해주세요.');
+      return;
+    }
+
+    if (formData.password !== formData.passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      const signupResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          userId: formData.userId,
+          password: formData.password,
+          nickname: formData.nickname,
+          birthDate: formData.birthDate,
+          gender: formData.gender,
+          location: formData.location,
+          referralId: formData.referralId || null
+        })
+      });
+
+      if (!signupResponse.ok) {
+        const errorData = await signupResponse.json();
+        throw new Error(errorData.message || '회원가입에 실패했습니다.');
+      }
+
+      const signupData = await signupResponse.json();
+      console.log('회원가입 성공:', signupData);
+
+      const loginResponse = await fetch('/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName: formData.userId,
+          userPassword: formData.password
+        })
+      });
+
+      if (loginResponse.ok) {
+        const loginData = await loginResponse.json();
+        
+        if (loginData.token) {
+          localStorage.setItem('token', loginData.token);
+          localStorage.setItem('user', JSON.stringify({
+            userId: formData.userId,
+            name: formData.name,
+            nickname: formData.nickname
+          }));
+        }
+      }
+
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('회원가입 에러:', error);
+      alert(error.message || '회원가입 처리 중 오류가 발생했습니다.');
+    }
+
+    setCurrentStep(3);
   };
 
-  // 서비스 시작
   const handleStartService = () => {
-    navigate('/auth/login');
+    navigate('/user/home');
   };
 
-  // 비밀번호 토글
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -71,7 +157,34 @@ const Signup = () => {
     setShowPasswordConfirm(!showPasswordConfirm);
   };
 
-  // 1단계: 기본 정보
+
+  const renderPasswordInput = (name, placeholder, show, toggleShow) => (
+    <div style={{ position: 'relative' }}>
+      <input
+        type={show ? "text" : "password"}
+        name={name}
+        className="form-input"
+        placeholder={placeholder}
+        value={formData[name]}
+        onChange={handleInputChange}
+        style={{ paddingRight: '50px' }}
+      />
+      <button
+        type="button"
+        className="password-toggle"
+        onClick={toggleShow}
+        aria-label={show ? "비밀번호 보기" : "비밀번호 숨기기"}
+      >
+        <img
+          src={show ? eyeOpen : eyeOff}
+          alt="toggle password visibility"
+          className="eye-icon"
+          draggable={false}
+        />
+      </button>
+    </div>
+  );
+
   const renderStep1 = () => (
     <>
       <h2>함께 하는 경산 루트</h2>
@@ -110,60 +223,14 @@ const Signup = () => {
           <label className="form-label">
             비밀번호<span className="required-mark">*</span>
           </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              className="form-input"
-              placeholder="비밀번호 입력"
-              value={formData.password}
-              onChange={handleInputChange}
-              style={{ paddingRight: '50px' }}
-            />
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={togglePasswordVisibility}
-              aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-            >
-              <img
-                src={showPassword ? eyeOff : eyeOpen}
-                alt="toggle password visibility"
-                className="eye-icon"
-                draggable={false}
-              />
-            </button>
-          </div>
+          {renderPasswordInput('password', '비밀번호 입력', showPassword, togglePasswordVisibility)}
         </div>
 
         <div className="form-group">
           <label className="form-label">
             비밀번호 재확인<span className="required-mark">*</span>
           </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPasswordConfirm ? "text" : "password"}
-              name="passwordConfirm"
-              className="form-input"
-              placeholder="비밀번호 재확인 입력"
-              value={formData.passwordConfirm}
-              onChange={handleInputChange}
-              style={{ paddingRight: '50px' }}
-            />
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={togglePasswordConfirmVisibility}
-              aria-label={showPasswordConfirm ? "비밀번호 숨기기" : "비밀번호 보기"}
-            >
-              <img
-                src={showPasswordConfirm ? eyeOff : eyeOpen}
-                alt="toggle password visibility"
-                className="eye-icon"
-                draggable={false}
-              />
-            </button>
-          </div>
+          {renderPasswordInput('passwordConfirm', '비밀번호 재확인 입력', showPasswordConfirm, togglePasswordConfirmVisibility)}
         </div>
 
         <button 
@@ -178,7 +245,6 @@ const Signup = () => {
     </>
   );
 
-  // 2단계: 추가 정보
   const renderStep2 = () => (
     <>
       <h2>함께 하는 경산 루트</h2>
@@ -204,25 +270,35 @@ const Signup = () => {
             생년월일 및 성별<span className="required-mark">*</span>
           </label>
           <div className="birth-gender-container">
-            <input
-              type="text"
-              name="birthDate"
-              className="form-input birth-input"
-              placeholder="YYYYMMDD"
-              value={formData.birthDate}
-              onChange={handleInputChange}
-              maxLength="8"
-            />
-            <select
-              name="gender"
-              className="gender-select"
-              value={formData.gender}
-              onChange={handleInputChange}
-            >
-              <option value="">성별</option>
-              <option value="M">남성</option>
-              <option value="F">여성</option>
-            </select>
+            <div className="birth-inputs">
+              <input
+                type="text"
+                className="birth-full"
+                placeholder="YYMMDD"
+                value={birthInputs.birthDate}
+                onChange={(e) => handleBirthInputChange('birthDate', e.target.value)}
+                maxLength="6"
+                inputMode="numeric"
+              />
+              <span className="birth-separator">-</span>
+              <input
+                type="text"
+                className="birth-segment gender-segment"
+                placeholder="0"
+                value={birthInputs.genderNum}
+                onChange={(e) => handleBirthInputChange('genderNum', e.target.value)}
+                maxLength="1"
+                inputMode="numeric"
+              />
+              <div className="gender-dots">
+                <span className="dot">•</span>
+                <span className="dot">•</span>
+                <span className="dot">•</span>
+                <span className="dot">•</span>
+                <span className="dot">•</span>
+                <span className="dot">•</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -279,7 +355,6 @@ const Signup = () => {
     </>
   );
 
-  // 3단계: 환영 메시지
   const renderStep3 = () => (
     <div className="welcome-container">
       <h1 className="welcome-title">{formData.name}님 환영합니다!</h1>
@@ -288,27 +363,19 @@ const Signup = () => {
         좋은 여행 루트를 찾아드려요.
       </p>
       
-      <div className="welcome-illustration">
-        🎉
-      </div>
+      <div className="welcome-illustration">🎉</div>
       
-      <button 
-        className="start-btn"
-        onClick={handleStartService}
-      >
-        서비스로 돌아가기
+      <button className="start-btn" onClick={handleStartService}>
+        성향 테스트하러 가기
       </button>
-      
-      <p style={{ marginTop: '20px', fontSize: '14px', color: 'var(--muted)' }}>
-        나중에 설정
-      </p>
+
+      <a className="later-link" href="/main">나중에 할게요</a> {/* 메인 페이지로 이동 */}
     </div>
   );
 
   return (
     <div className="signup-page">
       <div className="signup-wrapper">
-        {/* 헤더 영역 - 환영 페이지에서는 숨김 */}
         {currentStep !== 3 && (
           <div className="header">
             <button
@@ -317,17 +384,12 @@ const Signup = () => {
               aria-label="뒤로가기"
               onClick={handleGoBack}
             >
-              &lt;
+              <img src={backIcon} alt="뒤로가기" />
             </button>
-            <img
-              src={sandriLogo}
-              alt="Sandri Logo"
-              className="logo"
-            />
+            <img src={sandriLogo} alt="Sandri Logo" className="logo" />
           </div>
         )}
 
-        {/* 단계별 렌더링 */}
         {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
