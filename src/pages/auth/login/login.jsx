@@ -9,6 +9,7 @@ import naverLogo from '../../../assets/naver_logo.svg';
 import appleLogo from '../../../assets/apple.svg';
 import eyeOpen from '../../../assets/eye.svg';
 import eyeOff from '../../../assets/eye-off.svg';
+import backIcon from '../../../assets/back_icon.svg';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,8 +37,8 @@ const Login = () => {
       return;
     }
 
-    try { // fetch는 나중에 링크 수정
-      const response = await fetch('/users/login', {
+    try { 
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -49,7 +50,6 @@ const Login = () => {
         throw new Error('로그인 실패');
       }
 
-      const data = await response.json();
     } catch (error) {
       console.error('로그인 에러:', error);
       alert('비밀번호 또는 아이디가 일치하지 않습니다.');
@@ -68,7 +68,7 @@ const Login = () => {
   };
 
   const handleSignUp = () => {
-    navigate('/auth/signup');
+    navigate('/auth/register');
   };
 
   const handleKakaoLogin = () => {
@@ -97,7 +97,7 @@ const Login = () => {
             aria-label="뒤로가기"
             onClick={handleGoBack}
           >
-            &lt;
+            <img src={backIcon} alt="뒤로가기" />
           </button>
           <img
             src={sandriLogo}
@@ -119,7 +119,7 @@ const Login = () => {
               id="userName"
               name="userName"
               className="form-input"
-              placeholder="아이디, 혹은 휴대폰 번호 입력" // 일단 디자인이 이렇게 나와서 이렇게 함
+              placeholder="아이디 입력"
               value={formData.userName}
               onChange={handleInputChange}
             />
@@ -157,7 +157,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="login-button">
-            Login
+            로그인
           </button>
 
           <div className="links">

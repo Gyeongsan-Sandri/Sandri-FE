@@ -35,8 +35,8 @@
 	--card-bg: #ffffff;
 	--text: #111827;
 	--muted: #6b7280;
-	--primary: #3b82f6;
-	--primary-hover: #2563eb;
+	--primary: #0dd580;
+	--primary-hover: #39C071;
 	--border: #e5e7eb;
 	--radius: 14px;
 	--shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -52,7 +52,6 @@
   display: grid;
   place-items: stretch center;
   font-size: clamp(14px, 0.8vw + 12px, 16px);
-  /*padding: 24px;*/
   padding-left: calc(24px + env(safe-area-inset-left));
   padding-right: calc(24px + env(safe-area-inset-right));
   min-height: 100vh;
