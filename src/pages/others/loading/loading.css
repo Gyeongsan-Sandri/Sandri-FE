@@ -1,0 +1,27 @@
+.loading-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #0DD580
+}
+
+.loading-logo {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.logo-image {
+  width: 120px;
+  height: auto;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
