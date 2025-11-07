@@ -383,3 +383,60 @@
 	.signup-wrapper { padding: 18px; }
 	.signup-form { gap: 12px; }
 }
+
+/* 중복확인 버튼 스타일 - input 내부 배치 */
+.input-with-button {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-button .form-input {
+  width: 100%;
+  padding-right: 100px; /* 버튼 공간 확보 */
+}
+
+.check-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  background-color: #E4E5EB;
+  color: #6b7280;
+}
+
+.check-btn.active {
+  background-color: #3F99FF;
+  color: white;
+}
+
+.check-btn.active:hover {
+  background-color: #2d7ddb;
+}
+
+.check-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 검증 메시지 스타일 */
+.validation-message {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.validation-message.success {
+  color: #3F99FF;
+}
+
+.validation-message.error {
+  color: #FF7373;
+}
