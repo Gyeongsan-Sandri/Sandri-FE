@@ -1,0 +1,498 @@
+:root {
+  --bg: #ffffff;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #0DD580;
+  --primary-hover: #0bc170;
+  --border: #e5e7eb;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.mypage-container {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 0;
+  padding-bottom: 80px;
+}
+
+.mypage-content {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0; 
+}
+
+/* 로고 헤더 */
+.mypage-header {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--card-bg);
+}
+
+.mypage-logo {
+  height: 28px;
+  object-fit: contain;
+}
+
+/* 프로필 섹션 */
+.profile-section {
+  display: flex;
+  align-items: center;
+  padding: 24px 20px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-image-container {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  flex-shrink: 0;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-name {
+  font-size: clamp(16px, 2.5vw, 18px);
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.profile-edit-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: clamp(12px, 1.8vw, 14px);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.profile-edit-btn:hover {
+  background: #f9fafb;
+  color: var(--text);
+}
+
+/* 내 여행 섹션 */
+.my-travel-section {
+  width: 100%;
+  background: var(--card-bg);
+  padding: 20px;
+}
+
+.travel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.travel-title {
+  font-size: clamp(16px, 2.5vw, 18px);
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.travel-arrow-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.travel-cards {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.travel-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.travel-card {
+  flex: 0 0 auto;
+  width: 200px;
+  background: #f9fafb;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.travel-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.travel-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 16px;
+  backdrop-filter: blur(10px);
+}
+
+.travel-name {
+  font-size: clamp(15px, 2.2vw, 17px);
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--text);
+}
+
+.travel-review {
+  font-size: clamp(12px, 1.8vw, 14px);
+  color: var(--muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 500;
+}
+
+.no-travel-message {
+  font-size: clamp(13px, 2vw, 15px);
+  color: var(--muted);
+  text-align: center;
+  padding: 40px 20px;
+  margin: 0;
+}
+
+/* 내 포인트 섹션 */
+.points-section {
+  width: 100%;
+  background: var(--card-bg);
+}
+
+.points-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  cursor: pointer;
+}
+
+.points-title {
+  font-size: clamp(15px, 2.2vw, 17px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.points-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.points-value {
+  font-size: clamp(16px, 2.5vw, 18px);
+  font-weight: 700;
+  color: #3F99FF;
+}
+
+.points-arrow-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.points-store {
+  padding: 0 24px 20px 24px;
+  cursor: pointer;
+}
+
+.points-store-text {
+  width: 100%;
+  height: 46px;
+  background: #0DD580;
+  border-radius: 15px;
+  border: none;
+  color: white;
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.points-store-text:hover {
+  background: #39C071;
+}
+
+.points-store-text:active {
+  transform: translateY(1px);
+}
+
+/* 내 리뷰 섹션 */
+.review-section {
+  width: 100%;
+}
+
+.review-card {
+  background: var(--card-bg);
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.review-title {
+  font-size: clamp(15px, 2.2vw, 17px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.review-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-count {
+  font-size: clamp(14px, 2vw, 16px);
+  color: var(--muted);
+}
+
+.review-arrow-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* 취향 테스트 섹션 */
+.test-section {
+  width: 100%;
+  background: var(--card-bg);
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.test-image {
+  width: 80%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* 하단 메뉴 섹션 */
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 0;
+}
+
+.menu-item {
+  background: var(--card-bg);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.menu-text {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.logout-item {
+  justify-content: center;
+}
+
+.logout-text {
+  color: #FF7373;
+  font-weight: 600;
+}
+
+.logout-item:hover {
+  background: #fff5f5;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 420px) {
+  .mypage-container {
+    padding: 0;
+    padding-bottom: 65px;
+  }
+
+  .mypage-content {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .mypage-header {
+    padding: 12px 16px;
+  }
+
+  .mypage-logo {
+    height: 24px;
+  }
+
+  .profile-section {
+    padding: 20px 16px;
+  }
+
+  .profile-image-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .user-name {
+    font-size: 16px;
+  }
+
+  .profile-edit-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .test-section,
+  .travel-section,
+  .settings-section {
+    padding: 20px 16px;
+  }
+
+  .section-header h2 {
+    font-size: 18px;
+  }
+
+  .info-item {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .test-image-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .travel-card {
+    padding: 14px;
+  }
+
+  .travel-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .travel-name {
+    font-size: 14px;
+  }
+
+  .travel-date {
+    font-size: 12px;
+  }
+
+  .review-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .view-all-btn {
+    font-size: 13px;
+    padding: 10px;
+  }
+}
+
+/* 태블릿 반응형 */
+@media (min-width: 421px) and (max-width: 768px) {
+  .mypage-content {
+    max-width: 600px;
+  }
+
+  .profile-image-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .test-image-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* 데스크톱 반응형 */
+@media (min-width: 769px) {
+  .mypage-container {
+    padding: 0;
+  }
+
+  .mypage-content {
+    max-width: 480px;
+  }
+
+  .profile-image-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .test-image-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+}
