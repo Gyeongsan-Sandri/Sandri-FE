@@ -1,0 +1,222 @@
+:root {
+  --bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #0DD580;
+  --primary-hover: #39C071;
+  --border: #e5e7eb;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.modify-page {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  color: var(--text);
+  display: grid;
+  place-items: stretch center;
+  font-size: clamp(14px, 0.8vw + 12px, 16px);
+  min-height: 100vh;
+}
+
+.modify-wrapper {
+  width: 100%;
+  max-width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 */
+.modify-page .modify-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.modify-page .modify-back-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.modify-page .modify-back-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.modify-page .modify-title {
+  font-size: clamp(16px, 2.5vw, 18px);
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: var(--text);
+}
+
+.modify-page .complete-btn {
+  background: transparent;
+  border: none;
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  min-width: 40px;
+}
+
+.modify-page .complete-btn:hover {
+  color: var(--text);
+}
+
+/* 프로필 이미지 섹션 */
+.modify-page .profile-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.modify-page .profile-image-wrapper {
+  width: clamp(100px, 25vw, 140px);
+  height: clamp(100px, 25vw, 140px);
+  border-radius: 50%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.modify-page .profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 폼 그룹 */
+.modify-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modify-page .form-label {
+  font-size: clamp(13px, 1.8vw, 14px);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+/* 중복확인 버튼이 있는 input */
+.modify-page .input-with-button {
+  position: relative;
+  width: 100%;
+}
+
+.modify-page .input-with-button .form-input {
+  width: 100%;
+  padding-right: 100px;
+}
+
+.modify-page .form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  font-size: clamp(14px, 1.1vw, 16px);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.modify-page .form-input::placeholder {
+  color: #b3b3b3;
+}
+
+.modify-page .form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 213, 128, 0.15);
+}
+
+.modify-page .check-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%) !important;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  background-color: #E4E5EB;
+  color: #6b7280;
+}
+
+.modify-page .check-btn.active {
+  background-color: #3F99FF;
+  color: white;
+}
+
+.modify-page .check-btn.active:hover {
+  background-color: #2d7ddb;
+}
+
+.modify-page .check-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 검증 메시지 */
+.modify-page .validation-message {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding-left: 4px;
+}
+
+.modify-page .validation-message.success {
+  color: #3F99FF;
+}
+
+.modify-page .validation-message.error {
+  color: #FF7373;
+}
+
+/* 반응형 */
+@media (max-width: 420px) {
+  .modify-wrapper {
+    padding: 20px;
+  }
+  
+  .modify-header {
+    margin-bottom: 24px;
+  }
+  
+  .profile-section {
+    margin-bottom: 32px;
+  }
+}
+
+@media (min-width: 640px) {
+  .modify-wrapper {
+    max-width: 480px;
+  }
+}

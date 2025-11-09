@@ -22,8 +22,6 @@
 	display: grid;
 	place-items: stretch center;
 	font-size: clamp(14px, 0.8vw + 12px, 16px);
-	padding-left: calc(24px + env(safe-area-inset-left));
-	padding-right: calc(24px + env(safe-area-inset-right));
 	min-height: 100vh;
 }
 
@@ -53,14 +51,14 @@
 	color: var(--muted);
 }
 
-.header {
+.signup-page .header {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	margin-bottom: 16px;
 }
 
-.back-btn {
+.signup-page .back-btn {
 	width: 36px;
 	height: 36px;
 	display: inline-flex;
@@ -75,15 +73,15 @@
 	cursor: pointer;
 }
 
-.back-btn:hover { 
+.signup-page .back-btn:hover { 
 	background: #f3f4f6; 
 }
 
-.back-btn:active { 
+.signup-page .back-btn:active { 
 	transform: translateY(1px); 
 }
 
-.logo {
+.signup-page .logo {
 	width: 60px;
 	height: 60px;
 }
@@ -91,27 +89,27 @@
 .signup-form {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: clamp(18px, 2vw, 24px);
 	margin-top: 8px;
 }
 
-.form-group {
+.signup-page .form-group {
 	display: flex;
 	flex-direction: column;
 }
 
-.form-label { 
+.signup-page .form-label { 
 	font-size: 13px; 
 	font-weight: 600;
 	margin-bottom: 7px;
 }
 
-.required-mark {
+.signup-page .required-mark {
 	color: #ef4444;
 	margin-left: 2px;
 }
 
-.form-input {
+.signup-page .form-input {
 	width: 100%;
 	padding: 12px 16px;
 	border: 1px solid var(--border);
@@ -121,16 +119,16 @@
 	transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.form-input::placeholder { 
+.signup-page .form-input::placeholder { 
 	color: #b3b3b3; 
 }
 
-.form-input:focus {
+.signup-page .form-input:focus {
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
-.password-toggle {
+.signup-page .password-toggle {
 	position: absolute;
 	right: 8px;
 	top: 50%;
@@ -148,27 +146,27 @@
 	border-radius: 6px;
 }
 
-.password-toggle:hover {
+.signup-page .password-toggle:hover {
 	background: rgba(0,0,0,0.04);
 }
 
-.password-toggle:active {
+.signup-page .password-toggle:active {
 	background: rgba(0,0,0,0.08);
 }
 
-.eye-icon {
+.signup-page .eye-icon {
 	width: 22px;
 	height: 22px;
 	display: block;
 }
 
-.birth-gender-container {
+.signup-page .birth-gender-container {
 	display: flex;
 	gap: 12px;
 	align-items: center;
 }
 
-.birth-inputs {
+.signup-page .birth-inputs {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -180,12 +178,12 @@
 	flex: 1;
 }
 
-.birth-inputs:focus-within {
+.signup-page .birth-inputs:focus-within {
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px rgba(13, 213, 128, 0.15);
 }
 
-.birth-full {
+.signup-page .birth-full {
 	width: 80px;
 	border: none;
 	outline: none;
@@ -196,11 +194,11 @@
 	letter-spacing: 0.5px;
 }
 
-.birth-full::placeholder {
+.signup-page .birth-full::placeholder {
 	color: #b3b3b3;
 }
 
-.birth-segment {
+.signup-page .birth-segment {
 	width: 20px;
 	border: none;
 	outline: none;
@@ -210,39 +208,39 @@
 	background: transparent;
 }
 
-.birth-segment::placeholder {
+.signup-page .birth-segment::placeholder {
 	color: #b3b3b3;
 }
 
-.gender-segment {
+.signup-page .gender-segment {
 	width: 20px;
 }
 
-.birth-separator {
+.signup-page .birth-separator {
 	color: #b3b3b3;
 	font-size: clamp(14px, 1.1vw, 16px);
 	user-select: none;
 }
 
-.gender-dots {
+.signup-page .gender-dots {
 	display: flex;
 	gap: 10px;
 	margin-left: 12px;
 }
 
-.gender-dots .dot {
+.signup-page .gender-dots .dot {
 	color: #b3b3b3;
 	font-size: 12px;
 	line-height: 1;
 }
 
-.location-container {
+.signup-page .location-container {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.location-select {
+.signup-page .location-select {
 	width: 100%;
 	padding: 12px 16px;
 	border: 1px solid var(--border);
@@ -259,24 +257,24 @@
 	padding-right: 50px;
 }
 
-.location-select option {
+.signup-page .location-select option {
 	border-radius: 12px;
 	padding: 10px;
 }
 
-.location-select:focus {
+.signup-page .location-select:focus {
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
-.referral-label {
+.signup-page .referral-label {
 	font-size: 13px;
 	font-weight: 600;
 	margin-bottom: 7px;
 	color: var(--muted);
 }
 
-.next-btn {
+.signup-page .next-btn {
 	display: block;
 	width: 100%;
 	text-align: center;
@@ -292,15 +290,15 @@
 	transition: background-color .15s ease;
 }
 
-.next-btn.active {
+.signup-page .next-btn.active {
 	background: var(--primary);
 }
 
-.next-btn.active:hover {
+.signup-page .next-btn.active:hover {
 	background: var(--primary-hover);
 }
 
-.welcome-container {
+.signup-page .welcome-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -309,22 +307,22 @@
 	text-align: center;
 }
 
-.welcome-title {
+.signup-page .welcome-title {
 	font-size: clamp(24px, 3vw, 32px);
 	font-weight: 700;
 	margin-bottom: 16px;
 	color: var(--text);
 }
 
-.welcome-subtitle {
+.signup-page .welcome-subtitle {
 	font-size: clamp(14px, 1.5vw, 18px);
 	color: var(--muted);
 	margin-bottom: 40px;
 }
 
-.welcome-illustration {
-	width: 200px;
-	height: 200px;
+.signup-page .welcome-illustration {
+	width: clamp(210px, 50vw, 320px);
+	height: clamp(210px, 50vw, 320px);
 	margin: 20px 0;
 	background: #f0f9ff;
 	border-radius: 50%;
@@ -334,7 +332,13 @@
 	font-size: 48px;
 }
 
-.start-btn {
+.signup-page .welcome-illustration img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.signup-page .start-btn {
 	background: var(--primary);
 	color: white;
 	padding: 16px 32px;
@@ -346,11 +350,11 @@
 	transition: background-color .15s ease;
 }
 
-.start-btn:hover {
+.signup-page .start-btn:hover {
 	background: var(--primary-hover);
 }
 
-.later-link {
+.signup-page .later-link {
   display: block;
   margin-top: 30px;
   font-size: 14px;
@@ -359,27 +363,148 @@
   cursor: pointer;
 }
 
+/* 모바일 반응형 */
 @media (max-width: 420px) {
-	.signup-wrapper { 
-		padding: 22px; 
-	}
+  .signup-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .signup-wrapper {
+    padding: 20px 16px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .signup-page .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .signup-page .header {
+    margin-bottom: 30px;
+  }
+
+  .signup-page .title {
+    font-size: 22px;
+  }
+
+  .signup-page .subtitle {
+    font-size: 13px;
+  }
+
+  .signup-form {
+    gap: 14px;
+  }
+
+  .signup-page .input-group label {
+    font-size: 13px;
+  }
+
+  .signup-page .form-input {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .signup-page .input-with-button .form-input {
+    padding-right: 90px;
+  }
+
+  .signup-page .check-btn {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+
+  .signup-page .submit-btn {
+    padding: 14px;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  .signup-page .footer {
+    gap: 8px;
+    font-size: 13px;
+    margin-top: 16px;
+  }
 }
 
+/* 태블릿 반응형 */
+@media (min-width: 421px) and (max-width: 639px) {
+  .signup-wrapper {
+    max-width: 480px;
+  }
+}
+
+/* 데스크톱 반응형 */
 @media (min-width: 640px) {
-	.signup-wrapper { 
-		padding: 36px; 
-		max-width: 480px; 
-	}
+  .signup-wrapper {
+    padding: 36px;
+    max-width: 480px;
+    box-shadow: var(--shadow);
+  }
 }
 
-@media (min-width: 1024px) {
-	.signup-wrapper { 
-		width: 480px; 
-		max-width: 480px; 
-	}
+.signup-page .input-with-button {
+  position: relative;
+  width: 100%;
 }
 
-@media (max-width: 360px) {
-	.signup-wrapper { padding: 18px; }
-	.signup-form { gap: 12px; }
+.signup-page .input-with-button .form-input {
+  width: 100%;
+  padding-right: 100px; 
+}
+
+.signup-page .check-btn,
+.signup-wrapper .check-btn,
+.signup-page .input-with-button .check-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%) !important;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  background-color: #E4E5EB;
+  color: #6b7280;
+}
+
+.signup-page .check-btn.active,
+.signup-wrapper .check-btn.active,
+.signup-page .input-with-button .check-btn.active {
+  background-color: #3F99FF;
+  color: white;
+}
+
+.signup-page .check-btn.active:hover,
+.signup-wrapper .check-btn.active:hover,
+.signup-page .input-with-button .check-btn.active:hover {
+  background-color: #2d7ddb;
+}
+
+.signup-page .check-btn:disabled,
+.signup-wrapper .check-btn:disabled,
+.signup-page .input-with-button .check-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 검증 메시지 스타일 */
+.signup-page .validation-message {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.signup-page .validation-message.success {
+  color: #3F99FF;
+}
+
+.signup-page .validation-message.error {
+  color: #FF7373;
 }
