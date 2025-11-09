@@ -1,4 +1,4 @@
-.password-toggle {
+.login-page .password-toggle {
   position: absolute;
   right: 8px;
   top: 50%;
@@ -16,15 +16,15 @@
   border-radius: 6px;
 }
 
-.password-toggle:hover {
+.login-page .password-toggle:hover {
   background: rgba(0,0,0,0.04);
 }
 
-.password-toggle:active {
+.login-page .password-toggle:active {
   background: rgba(0,0,0,0.08);
 }
 
-.eye-icon {
+.login-page .eye-icon {
   width: 22px;
   height: 22px;
   display: block;
@@ -52,8 +52,6 @@
   display: grid;
   place-items: stretch center;
   font-size: clamp(14px, 0.8vw + 12px, 16px);
-  padding-left: calc(24px + env(safe-area-inset-left));
-  padding-right: calc(24px + env(safe-area-inset-right));
   min-height: 100vh;
 }
 
@@ -94,18 +92,18 @@
   margin-bottom: auto;
 } 
 
-.form-group {
+.login-page .form-group {
   display: flex;
   flex-direction: column;
 }
 
-.form-label { 
+.login-page .form-label { 
   font-size: 13px; 
   font-weight: 600;
   margin-bottom: 7px;
 } 
 
-.form-input {
+.login-page .form-input {
   width: 100%;
   padding: 12px 15px;
   margin-bottom: 7px;
@@ -117,7 +115,7 @@
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.form-input:focus {
+.login-page .form-input:focus {
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
@@ -171,7 +169,7 @@
   margin: 16px 0; 
 }
 
-.header {
+.login-page .header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -197,7 +195,7 @@
   transform: scale(1.05);
 }
 
-.back-btn {
+.login-page .back-btn {
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -212,57 +210,91 @@
   cursor: pointer;
 }
 
-.back-btn:hover { 
+.login-page .back-btn:hover { 
   background: #f3f4f6; 
 }
 
-.back-btn:active { 
+.login-page .back-btn:active { 
   transform: translateY(1px); 
 }
 
-.logo {
+.login-page .logo {
   width: 60px;
   height: 60px;
 }
 
-/* 작은 휴대폰 */
-@media (max-width: 360px) {
-  .login-wrapper { 
-    padding: 18px; 
-    border-radius: 10px; 
-  }
-  
-  .login-form { 
-    gap: 10px; 
-  }
-}
-
-/* 휴대폰 */
+/* 모바일 반응형 */
 @media (max-width: 420px) {
-  .login-wrapper { 
-    padding: 22px; 
+  .login-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .login-wrapper {
+    padding: 20px 16px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-page .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .login-page .header {
+    margin-bottom: 40px;
+  }
+
+  .login-page .title {
+    font-size: 22px;
+  }
+
+  .login-page .subtitle {
+    font-size: 13px;
+  }
+
+  .login-form {
+    gap: 12px;
+  }
+
+  .login-page .input-group label {
+    font-size: 13px;
+  }
+
+  .login-page .form-input {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .login-page .submit-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .login-page .footer {
+    gap: 8px;
+    font-size: 13px;
   }
 }
 
-/* 태블릿 */
+/* 태블릿 반응형 */
+@media (min-width: 421px) and (max-width: 639px) {
+  .login-wrapper {
+    max-width: 480px;
+  }
+}
+
+/* 데스크톱 반응형 */
 @media (min-width: 640px) {
-  .login-wrapper { 
-    padding: 36px; 
-    max-width: 480px; 
-  }
-}
-
-/* 노트북 */
-@media (min-width: 1024px) {
-  .login-wrapper { 
-    width: 480px; 
-    max-width: 480px; 
+  .login-wrapper {
+    padding: 36px;
+    max-width: 480px;
     box-shadow: var(--shadow);
-  } 
-  
-  /* 데스크톱에서 입력 폼을 약간 위로 올림 */
-  .login-form { 
-    margin-top: 40px; 
-    margin-bottom: auto; 
+  }
+
+  .login-form {
+    margin-top: 40px;
+    margin-bottom: auto;
   }
 }

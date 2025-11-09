@@ -5,7 +5,7 @@ import sandriLogo from '../../../assets/sandri_logo.svg';
 import eyeOpen from '../../../assets/eye.svg';
 import eyeOff from '../../../assets/eye-off.svg';
 import backIcon from '../../../assets/back_icon.svg';
-import welcome from '../../../assets/welcome.png';
+import welcome from '../../../assets/welcome.svg';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -179,14 +179,12 @@ const Signup = () => {
       }
 
       const result = await response.json();
-      
-      // 서버 응답 형식: { success, message, data: { message, duplicate } }
       if (!result.success || !result.data) {
         console.error('예상치 못한 응답 형식:', result);
         throw new Error(result.message || '서버 응답 형식이 올바르지 않습니다.');
       }
       
-      const isAvailable = !result.data.duplicate; // duplicate가 false면 사용 가능
+      const isAvailable = !result.data.duplicate; 
       
       setNicknameCheck({
         checked: true,
@@ -207,7 +205,7 @@ const Signup = () => {
   // 뒤로가기
   const handleGoBack = () => {
     if (currentStep === 1) {
-      navigate('/auth/login');
+      navigate('/users/login');
     } else {
       setCurrentStep(currentStep - 1);
     }
@@ -290,7 +288,6 @@ const Signup = () => {
         console.log('회원가입 성공 (응답 없음)');
       }
 
-      // 2. 자동 로그인 시도
       const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -301,14 +298,7 @@ const Signup = () => {
         })
       });
 
-      // 로그인 성공 시 사용자 정보 저장
       if (loginResponse.ok) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('user', JSON.stringify({
-          name: formData.name,
-          username: formData.username,
-          nickname: formData.nickname
-        }));
         console.log('자동 로그인 성공');
       }
 
@@ -329,12 +319,10 @@ const Signup = () => {
     navigate('/');
   };
 
-  // 비밀번호 표시/숨김 토글
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // 비밀번호 확인 표시/숨김 토글
   const togglePasswordConfirmVisibility = () => {
     setShowPasswordConfirm(!showPasswordConfirm);
   };

@@ -15,20 +15,17 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const Login = () => {
   const navigate = useNavigate();
   
-  // ========== State 관리 ==========
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  // ========== 입력 핸들러 ==========
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ========== 폼 제출 핸들러 ==========
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -43,7 +40,7 @@ const Login = () => {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // 쿠키 자동 처리
+        credentials: 'include',
         body: JSON.stringify(formData)
       });
 
@@ -51,28 +48,15 @@ const Login = () => {
         throw new Error('로그인 실패');
       }
 
-      // 사용자 정보 받기 (optional)
-      const userData = await response.json().catch(() => ({}));
-      
-      // localStorage에 로그인 상태 저장
-      localStorage.setItem('isLoggedIn', 'true');
-      if (userData.username) {
-        localStorage.setItem('user', JSON.stringify({
-          username: userData.username,
-          nickname: userData.nickname || formData.username
-        }));
-      }
-
-      console.log('✅ 로그인 성공');
+      console.log('로그인 성공');
       navigate('/mypage');
 
     } catch (error) {
-      console.error('❌ 로그인 에러:', error);
+      console.error('로그인 에러:', error);
       alert('비밀번호 또는 아이디가 일치하지 않습니다.');
     }
   };
 
-  // ========== 네비게이션 핸들러 ==========
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -81,7 +65,6 @@ const Login = () => {
     navigate('/users/register');
   };
 
-  // ========== 소셜 로그인 핸들러 (구현 예정) ==========
   const handleKakaoLogin = () => {
     console.log('카카오 로그인 구현중');
   };
@@ -94,12 +77,10 @@ const Login = () => {
     console.log('애플 로그인 구현중');
   };
 
-  // ========== UI 토글 핸들러 ==========
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // ========== 메인 렌더링 ==========
   return (
     <div className="login-page">
       <div className="login-wrapper">
