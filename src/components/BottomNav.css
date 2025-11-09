@@ -1,0 +1,90 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: 70px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.nav-item:hover {
+  color: #0DD580;
+}
+
+.nav-item.active {
+  color: #0DD580;
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 24px;
+  transition: transform 0.2s ease;
+}
+
+.nav-item:active .nav-icon {
+  transform: scale(0.9);
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 420px) {
+  .bottom-nav { 
+    height: 60px;
+    padding: 6px 0;
+  }
+
+  .nav-item {
+    padding: 4px;
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+  }
+}
+
+/* 태블릿 */
+@media (min-width: 421px) and (max-width: 639px) {
+  .bottom-nav {
+    max-width: 480px;
+  }
+}
+
+/* 데스크톱 */
+@media (min-width: 640px) {
+  .bottom-nav { 
+    max-width: 480px; 
+  }
+}
