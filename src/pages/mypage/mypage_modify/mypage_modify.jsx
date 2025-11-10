@@ -105,8 +105,8 @@ const MyPageModify = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
-        method: 'PUT',
+      const response = await fetch(`${API_BASE_URL}/api/user/nickname`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ nickname })

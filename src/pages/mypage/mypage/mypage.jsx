@@ -10,7 +10,29 @@ import noiceIcon from '../../../assets/notice.svg';
 import logo from '../../../assets/sandri_logo.svg';
 import nextIcon from '../../../assets/next.svg';
 
+// 여행 스타일 이미지 import
+import adventureImg from '../../../assets/test_result_img/adventure.png';
+import fairyImg from '../../../assets/test_result_img/fairy.png';
+import hotplaceImg from '../../../assets/test_result_img/hotplace.png';
+import planImg from '../../../assets/test_result_img/plan.png';
+import localImg from '../../../assets/test_result_img/native.png';
+import turtleImg from '../../../assets/test_result_img/turtle.png';
+import galleryImg from '../../../assets/test_result_img/gallery.png';
+import walkImg from '../../../assets/test_result_img/walk.png';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// 여행 스타일 매핑
+const travelStyleMap = {
+  'ADVENTURER': adventureImg,
+  'SENSITIVE_FAIRY': fairyImg,
+  'THOROUGH_PLANNER': planImg,
+  'LOCAL': localImg,
+  'HOTSPOT_HUNTER': hotplaceImg,
+  'HEALING_TURTLE': turtleImg,
+  'GALLERY_PEOPLE': galleryImg,
+  'WALKER': walkImg
+};
 
 function MyPage() {
   const navigate = useNavigate();
@@ -31,12 +53,20 @@ function MyPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'GET',
-        // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setUserProfile(data);
+        const result = await response.json();
+        if (result.success && result.data) {
+          setUserProfile({
+            username: result.data.username || '',
+            nickname: result.data.nickname || '',
+            name: result.data.name || '',
+            profileImage: result.data.profileImage || null,
+            travelStyle: result.data.travelStyle || null
+          });
+        }
       } else {
         console.error('프로필 조회 실패');
       }
@@ -145,13 +175,17 @@ function MyPage() {
           <div className="profile-left">
             <div className="profile-image-container">
               <img 
-                src={userProfile.profileImage || defaultProfile} 
+                src={
+                  userProfile.travelStyle && travelStyleMap[userProfile.travelStyle]
+                    ? travelStyleMap[userProfile.travelStyle]
+                    : userProfile.profileImage || defaultProfile
+                } 
                 alt="프로필" 
                 className="profile-image" 
               />
             </div>
             <div className="profile-info">
-              <h2 className="user-name">{userProfile.nickname || '???님'}</h2>
+              <h2 className="user-name">{userProfile.nickname || '???'}님</h2>
               <button className="profile-edit-btn" onClick={handleProfileEdit}>
                 프로필 수정
               </button>
@@ -221,7 +255,12 @@ function MyPage() {
 
         {/* 취향 테스트 섹션 */}
         <section className="test-section">
-          <img src={testImg} alt="취향 테스트" className="test-image" onClick={handleTestClick} />
+          <img 
+            src={testImg}
+            alt="취향 테스트" 
+            className="test-image" 
+            onClick={handleTestClick} 
+          />
         </section>
 
         {/* 하단 메뉴 섹션 */}

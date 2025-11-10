@@ -9,6 +9,8 @@ import myRouteIcon from '../assets/nav_icon/myroute_icon.svg';
 import interestIcon from '../assets/nav_icon/like_icon.svg';
 import myPageIcon from '../assets/nav_icon/mypage_icon.svg';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,7 +29,7 @@ function BottomNav() {
       label: '수집', 
       path: '/collection', 
       icon: collectionIcon,
-      requiresAuth: false
+      requiresAuth: true
     },
     { 
       id: 'myroute', 
@@ -60,11 +62,15 @@ function BottomNav() {
     return location.pathname.startsWith(path);
   };
 
-  const handleNavClick = (item) => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
+  const handleNavClick = async (item) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    const isLoggedIn = response.ok;
+
     if (item.requiresAuth && !isLoggedIn) {
-      // 로그인 필요 모달 표시
       setShowLoginModal(true);
       return;
     }
