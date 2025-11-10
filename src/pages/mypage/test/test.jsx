@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './test.css';
 
 import backIcon from '../../../assets/back_icon.svg';
@@ -22,9 +23,10 @@ import walkerImg from '../../../assets/test_result_img/walk.png';
 import galleryImg from '../../../assets/test_result_img/gallery.png';
 
 function Test() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState([]);
-  const [nickname] = useState('사용자'); // 나중에 실제 닉네임으로 교체
+  const [nickname, setNickname] = useState('사용자');
   const [resultDescription, setResultDescription] = useState('');
 
   // 질문 데이터
@@ -95,14 +97,14 @@ function Test() {
   ];
 
   const resultMapping = {
-    'outdoor-tight-local': { type: '모험왕', image: adventureImg, file: '../../../public/adventure.txt' },
-    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, file: '../../../public/fairy.txt' },
-    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, file: '../../../public/hotplace.txt' },
-    'outdoor-relaxed-local': { type: '현지인', image: localImg, file: '../../../public/local.txt' },
-    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, file: '../../../public/planner.txt' },
-    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, file: '../../../public/turtle.txt' },
-    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, file: '../../../public/walker.txt' },
-    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, file: '../../../public/gallery.txt' }
+    'outdoor-tight-local': { type: '모험왕', image: adventureImg, file: '../../../public/adventure.txt', apiType: 'ADVENTURER' },
+    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, file: '../../../public/fairy.txt', apiType: 'SENSITIVE_FAIRY' },
+    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, file: '../../../public/hotplace.txt', apiType: 'HOTSPOT_HUNTER' },
+    'outdoor-relaxed-local': { type: '현지인', image: localImg, file: '../../../public/local.txt', apiType: 'LOCAL' },
+    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, file: '../../../public/planner.txt', apiType: 'THOROUGH_PLANNER' },
+    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, file: '../../../public/turtle.txt', apiType: 'HEALING_TURTLE' },
+    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, file: '../../../public/walker.txt', apiType: 'WALKER' },
+    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, file: '../../../public/gallery.txt', apiType: 'GALLERY_PEOPLE' }
   };
 
   const calculateResult = (userAnswers) => {
@@ -119,18 +121,16 @@ function Test() {
     return resultMapping[resultKey];
   };
 
-  const sendResultToBackend = async (resultType, userAnswers) => {
+  const sendResultToBackend = async (resultType) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/travel-style`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
-          nickname: nickname,
-          resultType: resultType,
-          answers: userAnswers,
-          timestamp: new Date().toISOString()
+          travelStyle: resultType
         })
       });
       
@@ -142,10 +142,34 @@ function Test() {
     }
   };
 
+  // 사용자 프로필 조회하여 닉네임 가져오기
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/profile`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data && result.data.nickname) {
+          setNickname(result.data.nickname);
+        }
+      }
+    } catch (error) {
+      console.error('프로필 조회 에러:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 닉네임 가져오기
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
   useEffect(() => {
     if (step === 9) {
       const result = calculateResult(answers);
-      sendResultToBackend(result.type, answers);
+      sendResultToBackend(result.apiType);
       
       // 결과 설명 텍스트 로드
       fetch(`/${result.file}`)
@@ -230,7 +254,7 @@ function Test() {
     
     return (
       <div className="test-container result-scrollable">
-        <button className="back-button" onClick={() => setStep(0)}>
+        <button className="back-button" onClick={() => navigate('/mypage')}>
           <img src={backIcon} alt="뒤로가기" className="back-icon" />
         </button>
         <div className="test-content">
