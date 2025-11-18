@@ -1,0 +1,228 @@
+.likes-container {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 0;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.likes-wrapper {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 로딩 */
+.likes-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* 헤더 */
+.likes-header {
+  padding: 70px 20px 20px 20px; /* 상단 70px로 증가 */
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.likes-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* 그리드 */
+.likes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 20px;
+}
+
+/* 장소 카드 */
+.like-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.like-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.like-card-image {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.like-card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 하트 버튼 */
+.like-heart-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.like-heart-btn:hover {
+  transform: scale(1.1);
+}
+
+.like-heart-btn:active {
+  transform: scale(0.95);
+}
+
+.like-heart-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* 카드 정보 */
+.like-card-info {
+  padding: 12px;
+}
+
+.like-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.like-card-category {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+}
+
+/* 빈 상태 */
+.likes-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.likes-empty p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.likes-empty .empty-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 420px) {
+  .likes-container {
+    max-width: 420px;
+  }
+
+  .likes-grid {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .like-card-name {
+    font-size: 14px;
+  }
+
+  .like-card-category {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+
+  .like-heart-btn {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .like-heart-btn img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* 태블릿 반응형 */
+@media (min-width: 421px) and (max-width: 1023px) {
+  .likes-container {
+    max-width: 480px;
+  }
+
+  .likes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 데스크톱 반응형 */
+@media (min-width: 1024px) {
+  .likes-container {
+    max-width: 480px;
+  }
+
+  .likes-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 24px;
+  }
+}

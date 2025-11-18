@@ -14,7 +14,14 @@ const render = (status) => {
   }
 };
 
-function GoogleMapContainer({ latitude, longitude, placeName, nearbyPlaces = [] }) {
+function GoogleMapContainer({ 
+  latitude, 
+  longitude, 
+  placeName, 
+  nearbyPlaces = [],
+  center,
+  routeLocations = [] 
+}) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
@@ -32,6 +39,8 @@ function GoogleMapContainer({ latitude, longitude, placeName, nearbyPlaces = [] 
         longitude={longitude} 
         placeName={placeName}
         nearbyPlaces={nearbyPlaces}
+        center={center}
+        routeLocations={routeLocations}
       />
     </Wrapper>
   );

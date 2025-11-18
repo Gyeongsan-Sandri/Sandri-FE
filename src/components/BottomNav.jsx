@@ -34,7 +34,7 @@ function BottomNav() {
     { 
       id: 'myroute', 
       label: 'MY 루트', 
-      path: '/routes', 
+      path: '/routes/list', 
       icon: myRouteIcon,
       requiresAuth: true
     },

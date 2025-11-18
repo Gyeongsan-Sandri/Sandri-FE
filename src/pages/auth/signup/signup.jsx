@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './signup.css';
 import sandriLogo from '../../../assets/sandri_logo.svg';
-import eyeOpen from '../../../assets/eye.svg';
-import eyeOff from '../../../assets/eye-off.svg';
 import backIcon from '../../../assets/back_icon.svg';
 import welcome from '../../../assets/welcome.svg';
+import { Input, PasswordInput, Button, Select } from '../../../components/common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,8 +12,6 @@ const Signup = () => {
   const navigate = useNavigate();
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -51,6 +48,16 @@ const Signup = () => {
   // 비밀번호 일치 여부
   const [passwordMatch, setPasswordMatch] = useState(true);
   
+  // 비밀번호 유효성 검사 상태
+  const [passwordValid, setPasswordValid] = useState(true);
+
+  // 비밀번호 유효성 검사 함수
+  const validatePassword = (password) => {
+    if (!password) return true;
+    const regex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).*$/;
+    return regex.test(password);
+  };
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -63,6 +70,11 @@ const Signup = () => {
     // 닉네임 변경 시 중복확인 초기화
     if (name === 'nickname') {
       setNicknameCheck({ checked: false, available: false, message: '' });
+    }
+
+    // 비밀번호 유효성 검사
+    if (name === 'password') {
+      setPasswordValid(validatePassword(value));
     }
 
     // 비밀번호 일치 여부 실시간 확인
@@ -223,6 +235,11 @@ const Signup = () => {
       return;
     }
 
+    if (!passwordValid) {
+      alert('비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -319,41 +336,22 @@ const Signup = () => {
     navigate('/');
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const togglePasswordConfirmVisibility = () => {
-    setShowPasswordConfirm(!showPasswordConfirm);
-  };
-
-  // 비밀번호 입력 필드 
-  const renderPasswordInput = (name, placeholder, show, toggleShow) => (
-    <div style={{ position: 'relative' }}>
-      <input
-        type={show ? "text" : "password"}
-        name={name}
-        className="form-input"
-        placeholder={placeholder}
-        value={formData[name]}
-        onChange={handleInputChange}
-        style={{ paddingRight: '50px' }}
-      />
-      <button
-        type="button"
-        className="password-toggle"
-        onClick={toggleShow}
-        aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
-      >
-        <img
-          src={show ? eyeOpen : eyeOff}
-          alt="toggle password visibility"
-          className="eye-icon"
-          draggable={false}
-        />
-      </button>
-    </div>
-  );
+  // 지역 옵션
+  const locationOptions = [
+    { value: 'gyeongsan', label: '경산' },
+    { value: 'seoul', label: '서울' },
+    { value: 'gyeonggi', label: '경기/인천' },
+    { value: 'gyeongbuk', label: '경북' },
+    { value: 'gyeongnam', label: '경남' },
+    { value: 'daegu', label: '대구' },
+    { value: 'busan', label: '부산/울산' },
+    { value: 'chungbuk', label: '충북' },
+    { value: 'chungnam', label: '충남/대전/세종' },
+    { value: 'jeonbuk', label: '전북' },
+    { value: 'jeonnam', label: '전남/광주' },
+    { value: 'gangwon', label: '강원' },
+    { value: 'jeju', label: '제주' }
+  ];
 
   // Step 1
   const renderStep1 = () => (
@@ -362,74 +360,57 @@ const Signup = () => {
       <h3>서비스 이용을 위해 회원가입해 주세요</h3>
       
       <form className="signup-form" onSubmit={(e) => e.preventDefault()}>
-        <div className="form-group">
-          <label className="form-label">
-            이름<span className="required-mark">*</span>
-          </label>
-          <input
-            type="text"
-            name="name"
-            className="form-input"
-            placeholder="이름 입력"
-            value={formData.name}
-            onChange={handleInputChange}
-          />
-        </div>
+        <Input
+          label="이름"
+          required
+          name="name"
+          placeholder="이름 입력"
+          value={formData.name}
+          onChange={handleInputChange}
+        />
 
-        <div className="form-group">
-          <label className="form-label">
-            아이디<span className="required-mark">*</span>
-          </label>
-          <div className="input-with-button">
-            <input
-              type="text"
-              name="username"
-              className="form-input"
-              placeholder="아이디 입력"
-              value={formData.username}
-              onChange={handleInputChange}
-            />
-            <button
-              type="button"
-              className={`check-btn ${formData.username ? 'active' : ''}`}
-              onClick={checkUsername}
-              disabled={!formData.username}
-            >
-              중복확인
-            </button>
-          </div>
-          {usernameCheck.checked && (
-            <p className={`validation-message ${usernameCheck.available ? 'success' : 'error'}`}>
-              {usernameCheck.available ? usernameCheck.message : `*${usernameCheck.message}`}
-            </p>
-          )}
-        </div>
+        <Input
+          label="아이디"
+          required
+          name="username"
+          placeholder="아이디 입력"
+          value={formData.username}
+          onChange={handleInputChange}
+          showButton
+          buttonText="중복확인"
+          onButtonClick={checkUsername}
+          error={usernameCheck.checked && !usernameCheck.available ? usernameCheck.message : ''}
+          success={usernameCheck.checked && usernameCheck.available ? usernameCheck.message : ''}
+        />
 
-        <div className="form-group">
-          <label className="form-label">
-            비밀번호<span className="required-mark">*</span>
-          </label>
-          {renderPasswordInput('password', '비밀번호 입력', showPassword, togglePasswordVisibility)}
-        </div>
+        <PasswordInput
+          label="비밀번호"
+          required
+          name="password"
+          placeholder="비밀번호 입력"
+          value={formData.password}
+          onChange={handleInputChange}
+          error={formData.password && !passwordValid ? '비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.' : ''}
+        />
 
-        <div className="form-group">
-          <label className="form-label">
-            비밀번호 재확인<span className="required-mark">*</span>
-          </label>
-          {renderPasswordInput('confirmPassword', '비밀번호 재확인 입력', showPasswordConfirm, togglePasswordConfirmVisibility)}
-          {formData.confirmPassword && !passwordMatch && (
-            <p className="validation-message error">*비밀번호가 일치하지 않습니다.</p>
-          )}
-        </div>
+        <PasswordInput
+          label="비밀번호 재확인"
+          required
+          name="confirmPassword"
+          placeholder="비밀번호 재확인 입력"
+          value={formData.confirmPassword}
+          onChange={handleInputChange}
+          error={formData.confirmPassword && !passwordMatch ? '비밀번호가 일치하지 않습니다.' : ''}
+        />
 
-        <button 
-          type="button"
-          className={`next-btn ${formData.name && formData.username && formData.password && formData.confirmPassword ? 'active' : ''}`}
+        <Button
+          variant={formData.name && formData.username && formData.password && formData.confirmPassword ? 'primary' : 'secondary'}
+          size="large"
           onClick={handleNext}
           disabled={!formData.name || !formData.username || !formData.password || !formData.confirmPassword}
         >
           다음
-        </button>
+        </Button>
       </form>
     </>
   );
@@ -441,34 +422,19 @@ const Signup = () => {
       <h3>서비스 이용을 위해 회원가입해 주세요</h3>
       
       <form className="signup-form" onSubmit={(e) => e.preventDefault()}>
-        <div className="form-group">
-          <label className="form-label">
-            닉네임<span className="required-mark">*</span>
-          </label>
-          <div className="input-with-button">
-            <input
-              type="text"
-              name="nickname"
-              className="form-input"
-              placeholder="닉네임 입력"
-              value={formData.nickname}
-              onChange={handleInputChange}
-            />
-            <button
-              type="button"
-              className={`check-btn ${formData.nickname ? 'active' : ''}`}
-              onClick={checkNickname}
-              disabled={!formData.nickname}
-            >
-              중복확인
-            </button>
-          </div>
-          {nicknameCheck.checked && (
-            <p className={`validation-message ${nicknameCheck.available ? 'success' : 'error'}`}>
-              {nicknameCheck.available ? nicknameCheck.message : `*${nicknameCheck.message}`}
-            </p>
-          )}
-        </div>
+        <Input
+          label="닉네임"
+          required
+          name="nickname"
+          placeholder="닉네임 입력"
+          value={formData.nickname}
+          onChange={handleInputChange}
+          showButton
+          buttonText="중복확인"
+          onButtonClick={checkNickname}
+          error={nicknameCheck.checked && !nicknameCheck.available ? nicknameCheck.message : ''}
+          success={nicknameCheck.checked && nicknameCheck.available ? nicknameCheck.message : ''}
+        />
 
         <div className="form-group">
           <label className="form-label">
@@ -507,55 +473,33 @@ const Signup = () => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">
-            사는 곳<span className="required-mark">*</span>
-          </label>
-          <div className="location-container">
-            <select
-              name="location"
-              className="location-select"
-              value={formData.location}
-              onChange={handleInputChange}
-            >
-              <option value="">지역을 선택해주세요</option>
-              <option value="seoul">서울</option>
-              <option value="gyeonggi">경기/인천</option>
-              <option value="gyeongsan">경산</option>
-              <option value="gyeongbuk">경북</option>
-              <option value="gyeongnam">경남</option>
-              <option value="daegu">대구</option>
-              <option value="busan">부산/울산</option>
-              <option value="chungbuk">충북</option>
-              <option value="chungnam">충남/대전/세종</option>
-              <option value="jeonbuk">전북</option>
-              <option value="jeonnam">전남/광주</option>
-              <option value="gangwon">강원</option>
-              <option value="jeju">제주</option>
-            </select>
-          </div>
-        </div>
+        <Select
+          label="사는 곳"
+          required
+          name="location"
+          placeholder="지역을 선택해주세요"
+          value={formData.location}
+          onChange={handleInputChange}
+          options={locationOptions}
+        />
 
-        <div className="form-group">
-          <label className="referral-label">추천인 아이디</label>
-          <input
-            type="text"
-            name="referrerUsername"
-            className="form-input"
-            placeholder="추천인 아이디 입력 (선택사항)"
-            value={formData.referrerUsername}
-            onChange={handleInputChange}
-          />
-        </div>
+        <Input
+          label="추천인 아이디"
+          name="referrerUsername"
+          placeholder="추천인 아이디 입력 (선택사항)"
+          value={formData.referrerUsername}
+          onChange={handleInputChange}
+          className="referral-input"
+        />
 
-        <button 
-          type="button"
-          className={`next-btn ${formData.nickname && formData.birthDate && formData.gender && formData.location ? 'active' : ''}`}
+        <Button
+          variant={formData.nickname && formData.birthDate && formData.gender && formData.location ? 'primary' : 'secondary'}
+          size="large"
           onClick={handleSignupComplete}
           disabled={!formData.nickname || !formData.birthDate || !formData.gender || !formData.location}
         >
           회원가입
-        </button>
+        </Button>
       </form>
     </>
   );
@@ -573,9 +517,9 @@ const Signup = () => {
         <img src={welcome} alt="Welcome Illustration" className="welcome-image" />
       </div>
       
-      <button className="start-btn" onClick={handleTest}>
+      <Button variant="primary" size="large" onClick={handleTest} className="start-btn">
         성향 테스트하러 가기
-      </button>
+      </Button>
 
       <button className="later-link" onClick={handleStartService}>
         나중에 할게요
