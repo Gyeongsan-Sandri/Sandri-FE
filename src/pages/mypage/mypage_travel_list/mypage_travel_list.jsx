@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './mypage_travel_list.css';
+import { BackButton } from '../../../components/common';
 
-import backIcon from '../../../assets/back_icon.svg';
 import reviewPencilIcon from '../../../assets/review.svg';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -64,9 +64,7 @@ function MyPageTravelList() {
         
         {/* 헤더 */}
         <header className="travel-list-header">
-          <button className="back-btn" onClick={handleBack}>
-            <img src={backIcon} alt="뒤로가기" />
-          </button>
+          <BackButton onClick={handleBack} />
           <h1 className="travel-list-title">내 여행</h1>
           <div className="header-spacer"></div>
         </header>

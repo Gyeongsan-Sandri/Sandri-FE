@@ -6,7 +6,7 @@ function MainLayout() {
   const location = useLocation();
   
   // 하단 네비게이션을 숨길 경로들
-  const hideNavPaths = ['/users/login', '/users/register', '/test'];
+  const hideNavPaths = ['/users/login', '/users/register', '/test', '/routes/'];
   const shouldHideNav = hideNavPaths.some(path => location.pathname.startsWith(path));
 
   return (

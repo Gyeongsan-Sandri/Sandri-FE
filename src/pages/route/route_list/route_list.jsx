@@ -51,7 +51,7 @@ function RouteList() {
         }
 
         // HOT 루트 조회 (공개 루트 목록)
-        const hotResponse = await fetch(`${API_BASE_URL}/api/routes`, {
+        const hotResponse = await fetch(`${API_BASE_URL}/api/routes/hot`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -164,7 +164,7 @@ function RouteList() {
         };
         
         const urlResponse = await fetch(`${API_BASE_URL}/api/me/files`, {
-          method: 'PUT',
+          method: 'POST',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
@@ -183,16 +183,15 @@ function RouteList() {
               const uploadResponse = await fetch(presignedUrl, {
                 method: 'PUT',
                 body: formData.image,
-                headers: {
-                  'Content-Type': formData.image.type
-                }
+                headers: {'Content-Type': formData.image.type}
               });
               
               if (uploadResponse.ok) {
                 // 업로드 성공 시 최종 URL 저장
                 imageUrl = finalUrl;
               } else {
-                console.error('파일 업로드 실패');
+                const resText = await uploadResponse.text();
+                console.log(uploadResponse.status, resText);
               }
             }
           }
@@ -205,7 +204,8 @@ function RouteList() {
         startDate: formData.startDate,
         endDate: formData.endDate,
         locations: [], // 초기에는 빈 배열
-        public: formData.isPublic
+        public: formData.isPublic,
+        imageUrl: imageUrl
       };
 
       // 태그가 있으면 추가
@@ -243,8 +243,6 @@ function RouteList() {
               setMyRoutes(routesResult.data);
             }
           }
-          // 생성된 루트 상세 페이지로 이동
-          navigate(`/routes/${result.data.routeId}`);
         } else {
           alert('루트 생성에 실패했습니다.');
         }

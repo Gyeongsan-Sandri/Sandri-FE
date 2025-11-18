@@ -1,0 +1,369 @@
+:root {
+  --bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #0DD580;
+  --primary-hover: #39C071;
+  --border: #e5e7eb;
+  --border-light: #BDBDBD;
+  --radius: 20px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+  --coin-gradient: linear-gradient(180deg, #FFE792 0%, #FFD76A 58.65%, #FFB570 100%);
+  --coupon-gradient: linear-gradient(180deg, #68AFFF 33.17%, #96B6FF 73.08%, #C3BEFF 100%);
+  --coin-color: #D38600;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.pointshop-page {
+  font-family: 'Pretendard', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  color: var(--text);
+  display: grid;
+  place-items: stretch center;
+  min-height: 100vh;
+  padding-left: calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
+}
+
+.pointshop-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* 헤더 */
+.pointshop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+
+.pointshop-page .back-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pointshop-page .back-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.pointshop-title {
+  font-size: clamp(18px, 2.5vw, 22px);
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: var(--text);
+}
+
+.header-spacer {
+  width: 36px;
+}
+
+/* 상단 카드 섹션 */
+.top-cards-section {
+  padding: 20px 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.top-card {
+  flex: 1;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.top-card-label {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.top-card-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.coin-amount {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.coin-icon {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--coin-gradient);
+  border: 0.3px solid var(--coin-color);
+  flex-shrink: 0;
+}
+
+.coupon-amount {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 700;
+  color: var(--coin-color);
+}
+
+/* 탭 메뉴 */
+.tabs-section {
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs-container {
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 12px 0;
+  font-size: clamp(13px, 1.8vw, 14px);
+  font-weight: 600;
+  color: #C8C8C8;
+  text-align: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.tab-item.active {
+  color: var(--primary);
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.tab-indicator.tab-0 {
+  width: calc(33.333% - 0px);
+  transform: translateX(0);
+}
+
+.tab-indicator.tab-1 {
+  width: calc(33.333% - 0px);
+  transform: translateX(100%);
+}
+
+.tab-indicator.tab-2 {
+  width: calc(33.333% - 0px);
+  transform: translateX(200%);
+}
+
+/* 쿠폰 리스트 섹션 */
+.coupon-list-section {
+  padding: 20px 16px;
+  min-height: 400px;
+}
+
+.coupon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coupon-item {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.coupon-badge {
+  width: 78px;
+  height: 36px;
+  border-radius: 5px;
+  background: var(--coupon-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.coupon-badge.disabled {
+  background: #D9D9D9;
+}
+
+.coupon-badge-text {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 700;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.coupon-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coupon-price {
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.coupon-date {
+  font-size: clamp(11px, 1.6vw, 13px);
+  color: var(--muted);
+}
+
+.coupon-points {
+  position: absolute;
+  right: 17px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary);
+  border-radius: 50px;
+  padding: 8px 12px;
+  font-size: clamp(12px, 1.6vw, 13px);
+  font-weight: 600;
+  color: #FFFFFF;
+  text-align: center;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.coupon-points:hover {
+  background: var(--primary-hover);
+}
+
+.coupon-points:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.no-coupons-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.no-coupons-message p {
+  font-size: clamp(14px, 2vw, 16px);
+  margin: 0;
+}
+
+/* 반응형 */
+@media (max-width: 420px) {
+  .pointshop-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .pointshop-wrapper {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .pointshop-header {
+    padding: 12px 16px;
+  }
+
+  .pointshop-title {
+    font-size: 18px;
+  }
+
+  .pointshop-page .back-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pointshop-page .back-btn img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .top-cards-section {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .top-card {
+    padding: 12px;
+  }
+
+  .tabs-section {
+    padding: 0 16px;
+  }
+
+  .coupon-list-section {
+    padding: 16px;
+  }
+
+  .coupon-item {
+    padding: 12px;
+  }
+
+  .coupon-badge {
+    width: 60px;
+    height: 32px;
+  }
+
+  .coupon-points {
+    right: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 421px) and (max-width: 639px) {
+  .pointshop-wrapper {
+    max-width: 480px;
+  }
+}
+
+@media (min-width: 640px) {
+  .pointshop-wrapper {
+    max-width: 480px;
+  }
+}

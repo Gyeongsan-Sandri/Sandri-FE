@@ -1,0 +1,30 @@
+.heart-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  line-height: 0; /* 인라인 요소 간격 제거 */
+  box-sizing: content-box; /* 부모 padding 영향 최소화 */
+  cursor: pointer;
+}
+
+/* 오버레이 배치에 어울리는 기본 효과 (원한다면 외부 클래스에서 덮어씀) */
+.heart-btn.overlay {
+  width: 36px; /* spot_category PlaceCard와 동일 */
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.heart-btn.overlay:hover { background: rgba(0, 0, 0, 0.5); transform: scale(1.1); }
+
+.heart-btn .heart-icon { display: block; }

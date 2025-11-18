@@ -8,7 +8,9 @@ function GoogleMap({
   placeName, 
   nearbyPlaces = [],
   center,
-  routeLocations = []
+  routeLocations = [],
+  activeRouteIndex = null,
+  onRouteMarkerClick = () => {}
 }) {
   const ref = useRef(null);
   const [googleMap, setGoogleMap] = useState(null);
@@ -67,7 +69,9 @@ function GoogleMap({
               longitude={location.lng}
               placeName={location.name}
               isMain={false}
-              order={location.order || index + 1}
+              variant="route"
+              active={activeRouteIndex === index}
+              onClick={() => onRouteMarkerClick(index)}
             />
           ))}
           

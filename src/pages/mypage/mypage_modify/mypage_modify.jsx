@@ -4,12 +4,40 @@ import './mypage_modify.css';
 import backIcon from '../../../assets/back_icon.svg';
 import defaultProfile from '../../../assets/default_profile.png';
 
+// 여행 스타일 이미지 import
+import adventureImg from '../../../assets/test_result_img/adventure.png';
+import fairyImg from '../../../assets/test_result_img/fairy.png';
+import hotplaceImg from '../../../assets/test_result_img/hotplace.png';
+import planImg from '../../../assets/test_result_img/plan.png';
+import localImg from '../../../assets/test_result_img/native.png';
+import turtleImg from '../../../assets/test_result_img/turtle.png';
+import galleryImg from '../../../assets/test_result_img/gallery.png';
+import walkImg from '../../../assets/test_result_img/walk.png';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// 여행 스타일 매핑
+const travelStyleMap = {
+  'ADVENTURER': adventureImg,
+  'SENSITIVE_FAIRY': fairyImg,
+  'THOROUGH_PLANNER': planImg,
+  'LOCAL': localImg,
+  'HOTSPOT_HUNTER': hotplaceImg,
+  'HEALING_TURTLE': turtleImg,
+  'GALLERY_PEOPLE': galleryImg,
+  'WALKER': walkImg
+};
 
 const MyPageModify = () => {
   const navigate = useNavigate();
   
-  const [nickname, setNickname] = useState('');
+  const [userProfile, setUserProfile] = useState({
+    username: '',
+    nickname: '',
+    name: '',
+    profileImage: null,
+    travelStyle: null
+  });
   const [profileImage, setProfileImage] = useState(null);
   
   // 닉네임 중복확인 상태
@@ -29,9 +57,17 @@ const MyPageModify = () => {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          setNickname(data.nickname || '');
-          setProfileImage(data.profileImage || null);
+          const result = await response.json();
+          if (result.success && result.data) {
+            setUserProfile({
+              username: result.data.username || '',
+              nickname: result.data.nickname || '',
+              name: result.data.name || '',
+              profileImage: result.data.profileImage || null,
+              travelStyle: result.data.travelStyle || null
+            });
+            setProfileImage(result.data.profileImage || null);
+          }
         }
       } catch (error) {
         console.error('프로필 조회 에러:', error);
@@ -43,20 +79,20 @@ const MyPageModify = () => {
 
   // 닉네임 변경 핸들러
   const handleNicknameChange = (e) => {
-    setNickname(e.target.value);
+    setUserProfile(prev => ({ ...prev, nickname: e.target.value }));
     setNicknameCheck({ checked: false, available: false, message: '' });
   };
 
   // 닉네임 중복확인
   const checkNickname = async () => {
-    if (!nickname) {
+    if (!userProfile.nickname) {
       alert('닉네임을 입력해주세요.');
       return;
     }
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/auth/check-nickname?nickname=${nickname}`, 
+        `${API_BASE_URL}/api/auth/check-nickname?nickname=${userProfile.nickname}`, 
         {
           method: 'GET',
           credentials: 'include'
@@ -94,7 +130,7 @@ const MyPageModify = () => {
 
   // 완료 버튼 클릭
   const handleComplete = async () => {
-    if (!nickname) {
+    if (!userProfile.nickname) {
       alert('닉네임을 입력해주세요.');
       return;
     }
@@ -109,7 +145,7 @@ const MyPageModify = () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ nickname })
+        body: JSON.stringify({ nickname: userProfile.nickname })
       });
 
       if (response.ok) {
@@ -142,7 +178,11 @@ const MyPageModify = () => {
         <div className="profile-section">
           <div className="profile-image-wrapper">
             <img 
-              src={profileImage || defaultProfile} 
+              src={
+                userProfile.travelStyle && travelStyleMap[userProfile.travelStyle]
+                  ? travelStyleMap[userProfile.travelStyle]
+                  : profileImage || defaultProfile
+              } 
               alt="프로필" 
               className="profile-img" 
             />
@@ -158,14 +198,14 @@ const MyPageModify = () => {
               name="nickname"
               className="form-input"
               placeholder="닉네임 입력"
-              value={nickname}
+              value={userProfile.nickname}
               onChange={handleNicknameChange}
             />
             <button
               type="button"
-              className={`check-btn ${nickname ? 'active' : ''}`}
+              className={`check-btn ${userProfile.nickname ? 'active' : ''}`}
               onClick={checkNickname}
-              disabled={!nickname}
+              disabled={!userProfile.nickname}
             >
               중복확인
             </button>
