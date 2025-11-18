@@ -13,12 +13,14 @@ import GoogleMapContainer from '../../../components/GoogleMapContainer';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const TourSpots = () => {
-    const { id } = useParams();
+    const { placeId } = useParams();
     const navigate = useNavigate();
     const scrollRef = useRef(null);
     
     const [placeData, setPlaceData] = useState(null);
     const [nearbyPlaces, setNearbyPlaces] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [reviewTotalCount, setReviewTotalCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [loading, setLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -28,7 +30,7 @@ const TourSpots = () => {
     // 장소 데이터 가져오기
     const fetchPlaceData = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/places/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/places/${placeId}`, {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -50,7 +52,7 @@ const TourSpots = () => {
     // 주변 관광지 가져오기
     const fetchNearbyPlaces = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/places/${id}/nearby?count=3`, {
+            const response = await fetch(`${API_BASE_URL}/api/places/${placeId}/nearby?count=3`, {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -59,17 +61,37 @@ const TourSpots = () => {
             
             const result = await response.json();
             if (result.success) {
-                setNearbyPlaces(result.data || []);
+                setNearbyPlaces(result.data?.nearbyPlaces || []);
             }
         } catch (err) {
-            console.error('Nearby places error:', err);
+            console.error('Error fetching nearby places:', err);
+        }
+    };
+
+    // 리뷰 가져오기
+    const fetchReviews = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/places/${placeId}/reviews?size=3`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            if (!response.ok) throw new Error('리뷰를 불러올 수 없습니다.');
+            
+            const result = await response.json();
+            if (result.success) {
+                setReviews(result.data?.content || []);
+                setReviewTotalCount(result.data?.totalCount || 0);
+            }
+        } catch (err) {
+            console.error('Error fetching reviews:', err);
         }
     };
 
     // 좋아요 토글
     const toggleLike = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/places/${id}/like`, {
+            const response = await fetch(`${API_BASE_URL}/api/places/${placeId}/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,8 +132,9 @@ const TourSpots = () => {
     useEffect(() => {
         fetchPlaceData();
         fetchNearbyPlaces();
+        fetchReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, [placeId]);
 
     if (loading) {
         return <div className="tourspots-loading">로딩 중...</div>;
@@ -272,72 +295,69 @@ const TourSpots = () => {
                     </div>
 
                     {/* 리뷰 이미지 그리드 */}
-                    <div className="review-images-grid">
-                        {images.slice(0, 3).map((img, index) => (
-                            <div key={index} className="review-image-item">
-                                <img src={img} alt={`리뷰 ${index + 1}`} />
-                                {index === 2 && totalImages > 3 && (
-                                    <div className="more-images-overlay">
-                                        + {totalImages - 3}
+                    {reviews.some(review => review.photos && review.photos.length > 0) && (
+                        <div className="review-images-grid">
+                            {reviews
+                                .flatMap(review => review.photos || [])
+                                .slice(0, 3)
+                                .map((photo, index) => (
+                                    <div key={index} className="review-image-item">
+                                        <img src={photo.photoUrl} alt={`리뷰 ${index + 1}`} />
+                                        {index === 2 && reviews.flatMap(r => r.photos || []).length > 3 && (
+                                            <div className="more-images-overlay">
+                                                + {reviews.flatMap(r => r.photos || []).length - 3}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                                ))
+                            }
+                        </div>
+                    )}
 
                     {/* 리뷰 리스트 */}
                     <div className="reviews-list">
-                        <div className="review-item">
-                            <div className="review-user">
-                                <div className="user-avatar">
-                                    <div className="avatar-placeholder">👤</div>
-                                </div>
-                                <div className="user-info">
-                                    <span className="user-name">민앵앵</span>
-                                    <div className="review-rating">
-                                        <span className="stars">★★★★★</span>
-                                        <span className="review-date">2025.06.15.일요일</span>
+                        {reviews.length > 0 ? (
+                            reviews.map((review) => (
+                                <div key={review.reviewId} className="review-item">
+                                    <div className="review-user">
+                                        <div className="user-avatar">
+                                            {review.user?.profileImageUrl ? (
+                                                <img src={review.user.profileImageUrl} alt={review.user.nickname} />
+                                            ) : (
+                                                <div className="avatar-placeholder">👤</div>
+                                            )}
+                                        </div>
+                                        <div className="user-info">
+                                            <span className="user-name">{review.user?.nickname}</span>
+                                            <div className="review-rating">
+                                                <span className="stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                                                <span className="review-date">{new Date(review.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' })}</span>
+                                            </div>
+                                        </div>
                                     </div>
+                                    {review.photos && review.photos.length > 0 && (
+                                        <div className="review-photos">
+                                            {review.photos.slice(0, 3).map((photo) => (
+                                                <img key={photo.order} src={photo.photoUrl} alt="리뷰 사진" />
+                                            ))}
+                                        </div>
+                                    )}
+                                    <p className="review-content">{review.content}</p>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="no-reviews">
+                                <p>아직 리뷰가 없습니다.</p>
                             </div>
-                            <div className="review-photos">
-                                {images.slice(0, 3).map((img, idx) => (
-                                    <img key={idx} src={img} alt={`리뷰 사진 ${idx + 1}`} />
-                                ))}
-                            </div>
-                            <p className="review-content">
-                                사진찍기 좋은 스팟입니다. 거북이 산책시킬 때마다 여기에서 몇장찍고 좋습니다 ^^
-                            </p>
-                        </div>
-
-                        <div className="review-item">
-                            <div className="review-user">
-                                <div className="user-avatar">
-                                    <div className="avatar-placeholder">👤</div>
-                                </div>
-                                <div className="user-info">
-                                    <span className="user-name">동로가 되어라</span>
-                                    <div className="review-rating">
-                                        <span className="stars">★★★★★</span>
-                                        <span className="review-date">2025.06.15.일요일</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="review-photos">
-                                {images.slice(0, 3).map((img, idx) => (
-                                    <img key={idx} src={img} alt={`리뷰 사진 ${idx + 1}`} />
-                                ))}
-                            </div>
-                            <p className="review-content">
-                                반곡지 앞 카페 앞에서 자전거 빌려줘서 타고 한바퀴 돌았어요 생각보다 길거 좀 타니 다리 아프고 좋습니다
-                            </p>
-                        </div>
+                        )}
                     </div>
 
                     {/* 더보기 버튼 */}
-                    <button className="load-more-btn">
-                        12개 리뷰 더보기
-                    </button>
+                    {reviewTotalCount > 3 && (
+                        <button className="load-more-btn">
+                            {reviewTotalCount - 3}개 리뷰 더보기
+                        </button>
+                    )}
                 </div>
             </div>
 
