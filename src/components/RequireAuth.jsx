@@ -1,34 +1,38 @@
 import { useState, useEffect } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import LoginRequiredModal from './LoginRequiredModal';
+import { Navigate, Outlet } from 'react-router-dom';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function RequireAuth() {
-  const [showModal, setShowModal] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const location = useLocation();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      setShowModal(true);
-    }
-  }, [isLoggedIn, location.pathname]);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setShouldRedirect(true);
-  };
+        setIsLoggedIn(response.ok);
+      } catch (error) {
+        console.error('인증 확인 에러:', error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
 
-  if (!isLoggedIn && shouldRedirect) {
-    return <Navigate to="/mypage" replace />;
+    checkAuth();
+  }, []);
+
+  if (isChecking) {
+    return null; 
   }
 
   if (!isLoggedIn) {
-    return (
-      <>
-        <LoginRequiredModal isOpen={showModal} onClose={handleCloseModal} />
-      </>
-    );
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

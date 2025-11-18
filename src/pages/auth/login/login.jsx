@@ -6,9 +6,8 @@ import sandriLogo from '../../../assets/sandri_logo.svg';
 import kakaoLogo from '../../../assets/kakao.svg';
 import naverLogo from '../../../assets/naver_logo.svg';
 import appleLogo from '../../../assets/apple.svg';
-import eyeOpen from '../../../assets/eye.svg';
-import eyeOff from '../../../assets/eye-off.svg';
 import backIcon from '../../../assets/back_icon.svg';
+import { Input, PasswordInput, Button } from '../../../components/common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,7 +18,6 @@ const Login = () => {
     username: '',
     password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -77,10 +75,6 @@ const Login = () => {
     console.log('애플 로그인 구현중');
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <div className="login-page">
       <div className="login-wrapper">
@@ -104,68 +98,31 @@ const Login = () => {
         <h3>서비스 이용을 위해 로그인해주세요</h3>
 
         <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              아이디
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              className="form-input"
-              placeholder="아이디 입력"
-              value={formData.username}
-              onChange={handleInputChange}
-            />
-          </div>
+          <Input
+            label="아이디"
+            name="username"
+            placeholder="아이디 입력"
+            value={formData.username}
+            onChange={handleInputChange}
+          />
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              비밀번호
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                className="form-input"
-                placeholder="비밀번호 입력"
-                value={formData.password}
-                onChange={handleInputChange}
-                style={{ paddingRight: '50px' }}
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={togglePasswordVisibility}
-                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-              >
-                <img
-                  src={showPassword ? eyeOpen : eyeOff}
-                  alt="toggle password visibility"
-                  className="eye-icon"
-                  draggable={false}
-                />
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            label="비밀번호"
+            name="password"
+            placeholder="비밀번호 입력"
+            value={formData.password}
+            onChange={handleInputChange}
+          />
 
-          <button type="submit" className="login-button">
+          <Button type="submit" variant="primary" size="large" className="login-button">
             로그인
-          </button>
+          </Button>
 
           <div className="links">
             <button
               type="button"
               onClick={handleSignUp}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--primary)',
-                textDecoration: 'none',
-                cursor: 'pointer',
-                fontSize: 'inherit'
-              }}
+              className="link-button"
             >
               회원가입
             </button>
