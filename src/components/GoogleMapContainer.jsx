@@ -20,7 +20,9 @@ function GoogleMapContainer({
   placeName, 
   nearbyPlaces = [],
   center,
-  routeLocations = [] 
+  routeLocations = [],
+  activeRouteIndex = null,
+  onRouteMarkerClick = () => {}
 }) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -41,6 +43,8 @@ function GoogleMapContainer({
         nearbyPlaces={nearbyPlaces}
         center={center}
         routeLocations={routeLocations}
+        activeRouteIndex={activeRouteIndex}
+        onRouteMarkerClick={onRouteMarkerClick}
       />
     </Wrapper>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './likes.css';
-import likedIcon from '../../assets/tourspots_icon/is_like.svg';
+import LikeHeart from '../../components/LikeHeart/LikeHeart.jsx';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -27,7 +27,6 @@ const Likes = () => {
             const result = await response.json();
             if (result.success) {
                 const data = result.data || {};
-                // places, routes, magazines를 하나의 배열로 합치기
                 const allItems = [
                     ...(data.places || []).map(item => ({ ...item, itemType: 'place' })),
                     ...(data.routes || []).map(item => ({ ...item, itemType: 'route' })),
@@ -45,7 +44,6 @@ const Likes = () => {
     // 좋아요 토글
     const toggleLike = async (item, currentLikeStatus) => {
         try {
-            // itemType으로 type 결정
             const type = item.itemType || 'place';
             let targetId = item.placeId || item.routeId || item.magazineId;
 
@@ -138,15 +136,13 @@ const Likes = () => {
                                         src={getImageUrl(item)} 
                                         alt={item.name || item.title || '이미지'} 
                                     />
-                                    <button 
-                                        className="like-heart-btn"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleLike(item, true);
-                                        }}
-                                    >
-                                        <img src={likedIcon} alt="관심" />
-                                    </button>
+                                    <LikeHeart
+                                        isLiked={true}
+                                        onToggle={(e) => toggleLike(item, true)}
+                                        className="like-heart-btn overlay"
+                                        size={22}
+                                        containerSize={36}
+                                    />
                                 </div>
                                 <div 
                                     className="like-card-info"

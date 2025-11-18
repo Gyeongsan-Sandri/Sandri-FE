@@ -26,42 +26,80 @@ function MyRoute() {
   const [routeData, setRouteData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(1);
+  const [activeRouteIndex, setActiveRouteIndex] = useState(null);
   const [showBottomSheet, setShowBottomSheet] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCompanionModal, setShowCompanionModal] = useState(false);
+  const [showAddPlaceModal, setShowAddPlaceModal] = useState(false);
   const [shareData, setShareData] = useState(null);
   const [companions, setCompanions] = useState([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedCompanions, setSelectedCompanions] = useState([]);
+  const [activeMemoId, setActiveMemoId] = useState(null);
   const [memoText, setMemoText] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [searchPlaces, setSearchPlaces] = useState([]);
+  const [placesPage, setPlacesPage] = useState(1);
+  const [placesHasMore, setPlacesHasMore] = useState(true);
+  const [placesLoading, setPlacesLoading] = useState(false);
 
   // 루트 상세 정보 조회
-  useEffect(() => {
-    const fetchRouteDetail = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/routes/${routeId}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+  const fetchRouteDetail = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/routes/${routeId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setRouteData(result.data);
-          }
-        } else {
-          console.error('루트 상세 조회 실패');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setRouteData(result.data);
         }
-      } catch (error) {
-        console.error('루트 상세 조회 에러:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error('루트 상세 조회 실패');
       }
-    };
-
-    if (routeId) {
-      fetchRouteDetail();
+    } catch (error) {
+      console.error('루트 상세 조회 에러:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // 장소 목록(전체) 조회
+  const fetchPlaces = async (mode = 'append') => {
+    if (placesLoading) return;
+    setPlacesLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory !== '전체') params.append('category', selectedCategory);
+      if (searchQuery.trim()) params.append('keyword', searchQuery.trim());
+      params.append('page', mode === 'reset' ? '1' : String(placesPage));
+      params.append('size', '10');
+
+      const url = `${API_BASE_URL}/api/places?${params.toString()}`;
+      const response = await fetch(url, { method: 'GET', credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const list = data.data;
+          const merged = mode === 'reset' ? list : [...searchPlaces, ...list];
+          setSearchPlaces(merged);
+          setPlacesHasMore(list.length === 10);
+          setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
+        }
+      }
+    } catch (e) {
+      console.error('장소 목록 조회 실패:', e);
+    } finally {
+      setPlacesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (routeId) fetchRouteDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeId]);
 
   // 뒤로가기
@@ -71,8 +109,46 @@ function MyRoute() {
 
   // 장소 추가
   const handleAddPlace = () => {
-    navigate(`/route/${routeId}/add-place`);
+    setShowAddPlaceModal(true);
+    setPlacesPage(1);
+    setPlacesHasMore(true);
+    fetchPlaces('reset');
   };
+
+  // (removed) 관심 장소 목록: 전체 장소 검색으로 대체
+
+  // 장소 추가 모달 닫기
+  const handleCloseAddPlaceModal = () => {
+    setShowAddPlaceModal(false);
+    setSearchQuery('');
+    setSelectedCategory('전체');
+  };
+
+  // 루트에 장소 추가
+  const handleAddPlaceToRoute = async (place) => {
+    try {
+      const postResponse = await fetch(`${API_BASE_URL}/api/routes/${routeId}/locations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ dayNumber: selectedDay, placeId: place.placeId || place.id })
+      });
+
+      if (postResponse.ok) {
+        alert('장소가 추가되었습니다!');
+        handleCloseAddPlaceModal();
+        await fetchRouteDetail();
+      } else {
+        alert('장소 추가에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('장소 추가 에러:', error);
+      alert('장소 추가 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 장소 목록 (서버 필터 사용)
+  const filteredPlaces = searchPlaces;
 
   // 바텀시트 토글
   const toggleBottomSheet = () => {
@@ -202,7 +278,7 @@ function MyRoute() {
 
       if (response.ok) {
         alert('루트가 삭제되었습니다.');
-        navigate('/routes');
+        navigate('/routes/list');
       }
     } catch (error) {
       console.error('루트 삭제 에러:', error);
@@ -210,14 +286,65 @@ function MyRoute() {
     }
   };
 
-  // 메모 생성 (임시)
-  const handleCreateMemo = async (placeId) => {
-    const memo = prompt('메모를 입력하세요:');
-    if (!memo) return;
+  // 메모 입력창 토글
+  const handleToggleMemo = (locationId, currentMemo = '') => {
+    if (activeMemoId === locationId) {
+      setActiveMemoId(null);
+      setMemoText('');
+    } else {
+      setActiveMemoId(locationId);
+      setMemoText(currentMemo);
+    }
+  };
 
-    // TODO: 실제 API 연동
-    console.log('메모 생성:', { placeId, memo });
-    alert('메모가 저장되었습니다. (임시)');
+  // 메모 저장
+  const handleSaveMemo = async (locationId) => {
+    if (!memoText.trim()) {
+      setActiveMemoId(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/routes/${routeId}/locations/${locationId}/memo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ memo: memoText })
+      });
+
+      if (response.ok) {
+        alert('메모가 저장되었습니다.');
+        setActiveMemoId(null);
+        setMemoText('');
+        // 루트 데이터 새로고침
+        window.location.reload();
+      } else {
+        alert('메모 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('메모 저장 에러:', error);
+      alert('메모 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 메모 입력창 외부 클릭 시 저장
+  const handleMemoBlur = (locationId) => {
+    if (activeMemoId === locationId && memoText.trim()) {
+      handleSaveMemo(locationId);
+    } else {
+      setActiveMemoId(null);
+      setMemoText('');
+    }
+  };
+
+  // Enter 키로 메모 저장
+  const handleMemoKeyPress = (e, locationId) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveMemo(locationId);
+    }
   };
 
   if (loading) {
@@ -228,8 +355,13 @@ function MyRoute() {
     return <div className="myroute-error">루트를 찾을 수 없습니다.</div>;
   }
 
-  // 현재 선택된 날짜의 장소들
-  const currentDayPlaces = routeData.days?.find(day => day.dayNumber === selectedDay)?.places || [];
+  // 현재 선택된 날짜의 장소들 (API: locations 기반)
+  const allLocations = routeData.locations || [];
+  const uniqueDays = Array.from(new Set(allLocations.map(l => l.dayNumber))).sort((a,b) => a-b);
+  const safeSelectedDay = uniqueDays.length ? selectedDay : 1;
+  const currentDayPlaces = allLocations
+    .filter(loc => loc.dayNumber === safeSelectedDay)
+    .sort((a,b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
   // 지도에 표시할 위치들
   const mapLocations = currentDayPlaces.map(place => ({
@@ -250,11 +382,11 @@ function MyRoute() {
           
           {/* 일행 프로필 */}
           <div className="companions-profiles" onClick={handleOpenCompanionModal}>
-            {routeData.companions?.slice(0, 3).map((companion, index) => (
+            {routeData.participants?.slice(0, 3).map((p, index) => (
               <img 
-                key={companion.userId || index}
-                src={companion.profileImage || defaultProfile}
-                alt={companion.nickname || '일행'}
+                key={p.userId || index}
+                src={defaultProfile}
+                alt={p.userNickname || p.userName || '일행'}
                 className="companion-profile"
                 style={{ zIndex: 3 - index }}
               />
@@ -280,6 +412,8 @@ function MyRoute() {
         <GoogleMapContainer 
           center={mapLocations[0] || { lat: 37.5665, lng: 126.9780 }}
           routeLocations={mapLocations}
+          activeRouteIndex={activeRouteIndex}
+          onRouteMarkerClick={(idx) => setActiveRouteIndex(idx)}
         />
         
         {/* 주변 탐색 버튼 */}
@@ -304,14 +438,14 @@ function MyRoute() {
           {/* 타이틀 및 날짜 */}
           <div className="route-title-section">
             <div className="title-row">
-              <h1 className="route-title">{routeData.name}</h1>
+              <h1 className="route-title">{routeData.title}</h1>
               <div className="route-visibility">
                 <img 
-                  src={routeData.isPublic ? publicIcon : privateIcon} 
-                  alt={routeData.isPublic ? '공개' : '비공개'}
+                  src={routeData.public ? publicIcon : privateIcon} 
+                  alt={routeData.public ? '공개' : '비공개'}
                   className="visibility-icon"
                 />
-                <span>{routeData.isPublic ? '공개' : '비공개'}</span>
+                <span>{routeData.public ? '공개' : '비공개'}</span>
               </div>
             </div>
             
@@ -343,13 +477,13 @@ function MyRoute() {
 
           {/* DAY 선택 */}
           <div className="day-selector">
-            {routeData.days?.map((day) => (
+            {(uniqueDays.length ? uniqueDays : [1]).map((dayNum) => (
               <button
-                key={day.dayNumber}
-                className={`day-btn ${selectedDay === day.dayNumber ? 'active' : ''}`}
-                onClick={() => setSelectedDay(day.dayNumber)}
+                key={dayNum}
+                className={`day-btn ${selectedDay === dayNum ? 'active' : ''}`}
+                onClick={() => setSelectedDay(dayNum)}
               >
-                DAY {day.dayNumber}
+                DAY {dayNum}
               </button>
             ))}
           </div>
@@ -362,8 +496,8 @@ function MyRoute() {
               </div>
             ) : (
               currentDayPlaces.map((place, index) => (
-                <div key={place.placeId || index} className="place-item">
-                  <div className="place-number">{place.order || index + 1}</div>
+                <div key={place.id || index} className="place-item" onClick={() => setActiveRouteIndex(index)}>
+                  <div className="place-number">{(place.displayOrder ?? index) + 1}</div>
                   
                   <div className="place-content">
                     <div className="place-image">
@@ -380,14 +514,29 @@ function MyRoute() {
 
                     <button 
                       className="memo-btn" 
-                      onClick={() => handleCreateMemo(place.placeId)}
+                      onClick={() => handleToggleMemo(place.id, place.memo)}
                       title="메모 추가"
                     >
                       <img src={memoIcon} alt="메모" />
                     </button>
                   </div>
 
-                  {place.memo && (
+                  {/* 메모 표시 또는 입력창 */}
+                  {activeMemoId === place.id ? (
+                    <div className="place-memo-input">
+                      <img src={memoIcon} alt="메모" className="memo-icon" />
+                      <input
+                        type="text"
+                        value={memoText}
+                        onChange={(e) => setMemoText(e.target.value)}
+                        onBlur={() => handleMemoBlur(place.id)}
+                        onKeyPress={(e) => handleMemoKeyPress(e, place.id)}
+                        placeholder="메모를 입력하세요"
+                        className="memo-input"
+                        autoFocus
+                      />
+                    </div>
+                  ) : place.memo && (
                     <div className="place-memo">
                       <img src={memoIcon} alt="메모" className="memo-icon" />
                       <p>{place.memo}</p>
@@ -516,8 +665,115 @@ function MyRoute() {
           </div>
         </>
       )}
+
+      {/* 장소 추가 모달 */}
+      {showAddPlaceModal && (
+        <>
+          <div className="modal-overlay" onClick={handleCloseAddPlaceModal} />
+          <div className="add-place-sheet">
+            <div className="modal-header">
+              <h2>장소 추가</h2>
+              <button className="modal-close-btn" onClick={handleCloseAddPlaceModal}>×</button>
+            </div>
+            
+            {/* 검색 */}
+            <div className="search-section">
+              <div className="search-input-wrapper">
+                <img src={searchIcon} alt="검색" className="search-icon" />
+                <input 
+                  type="text"
+                  placeholder="검색"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); }}
+                  className="search-input"
+                />
+              </div>
+              <div className="search-actions">
+                <button className="search-run-btn" onClick={() => { setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}>검색</button>
+              </div>
+            </div>
+
+            {/* 카테고리 선택 */}
+            <div className="category-section">
+              <h3>추천 카테고리</h3>
+              <div className="category-grid">
+                <button 
+                  className={`category-item ${selectedCategory === '전체' ? 'selected' : ''}`}
+                  onClick={() => { setSelectedCategory('전체'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                >
+                  전체
+                </button>
+                <button 
+                  className={`category-item ${selectedCategory === '자연/힐링' ? 'selected' : ''}`}
+                  onClick={() => { setSelectedCategory('자연/힐링'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                >
+                  자연/힐링
+                </button>
+                <button 
+                  className={`category-item ${selectedCategory === '역사/전통' ? 'selected' : ''}`}
+                  onClick={() => { setSelectedCategory('역사/전통'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                >
+                  역사/전통
+                </button>
+                <button 
+                  className={`category-item ${selectedCategory === '문화/체험' ? 'selected' : ''}`}
+                  onClick={() => { setSelectedCategory('문화/체험'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                >
+                  문화/체험
+                </button>
+                <button 
+                  className={`category-item ${selectedCategory === '식도락' ? 'selected' : ''}`}
+                  onClick={() => { setSelectedCategory('식도락'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                >
+                  식도락
+                </button>
+              </div>
+            </div>
+
+            {/* 장소 목록 */}
+            <div className="liked-places-section">
+              <h3>장소 목록</h3>
+              <div className="liked-places-grid">
+                {filteredPlaces.length > 0 ? (
+                  filteredPlaces.map((place) => (
+                    <div 
+                      key={place.placeId} 
+                      className="place-card"
+                      onClick={() => handleAddPlaceToRoute(place)}
+                    >
+                      <div className="place-image">
+                        <img 
+                          src={place.thumbnailUrl || place.officialPhotos?.[0]?.photoUrl || place.photos?.[0]?.photoUrl || 'https://via.placeholder.com/150'} 
+                          alt={place.name} 
+                        />
+                      </div>
+                      <div className="place-info">
+                        <h4>{place.name}</h4>
+                        <p className="place-address">{place.address}</p>
+                        {place.categoryName && (<span className="place-category">#{place.categoryName}</span>)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-message">
+                    {placesLoading ? '로딩 중...' : '검색 결과가 없습니다.'}
+                  </div>
+                )}
+              </div>
+              {placesHasMore && (
+                <div className="load-more-container" style={{padding:'12px 0 24px'}}>
+                  <button className="load-more-btn" onClick={() => fetchPlaces('append')} disabled={placesLoading}>
+                    {placesLoading ? '로딩 중...' : '더보기'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 export default MyRoute;
+

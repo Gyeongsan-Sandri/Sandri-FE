@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './collection_start.css';
+import { BackButton } from '../../components/common';
 
-import backIcon from '../../assets/back_icon.svg';
 import sandriCollect from '../../assets/sandri_collect.svg';
 import badge from '../../assets/badge.svg';
 
@@ -14,9 +14,7 @@ function CollectionStart() {
         
         {/* 헤더 */}
         <header className="collection-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <img src={backIcon} alt="뒤로가기" />
-          </button>
+          <BackButton onClick={() => navigate(-1)} />
           <div className="header-spacer"></div>
         </header>
 

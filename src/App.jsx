@@ -7,6 +7,7 @@ import LoadingPage from "./pages/others/loading/loading";
 
 const Home = lazy(() => import("./pages/main/home/home"));
 const Magazine = lazy(() => import("./pages/main/magazine/magazine"));
+const MagazineList = lazy(() => import("./pages/main/magazine_list/magazine_list"));
 const SpotSearch = lazy(() => import("./pages/main/spot_search/spot_search"));
 const SpotCategory = lazy(() => import("./pages/main/spot_category/spot_category"));
 
@@ -23,6 +24,7 @@ const RouteSearch = lazy(() => import("./pages/route/route_search/route_search")
 const Likes = lazy(() => import("./pages/likes/likes"))
 
 const MyPage = lazy(() => import("./pages/mypage/mypage/mypage"));
+const MyPagePointShop = lazy(() => import("./pages/mypage/mypage_pointshop/mypage_pointshop"));
 const MyPageModify = lazy(() => import("./pages/mypage/mypage_modify/mypage_modify"));
 const MyPageReview = lazy(() => import("./pages/mypage/mypage_review/mypage_review"));
 const MyPageTravelList = lazy(() => import("./pages/mypage/mypage_travel_list/mypage_travel_list"));
@@ -40,7 +42,8 @@ export default function App() {
           <Route element={<MainLayout />}>
             {/* 홈  */}
             <Route index element={<Home />} />
-            <Route path="magazine" element={<Magazine />} />
+            <Route path="magazine" element={<MagazineList />} />
+            <Route path="magazine/:magazineId" element={<Magazine />} />
             <Route path="spot/search" element={<SpotSearch />} />
             <Route path="spot/categories" element={<SpotCategory />} />
 
@@ -58,6 +61,8 @@ export default function App() {
               <Route path="routes/:routeId" element={<TravelRoute />} />
 
               <Route path="mypage" element={<MyPage />} />
+              <Route path="mypage/point-shop" element={<MyPagePointShop />} />
+              <Route path="mypage/pointshop" element={<MyPagePointShop />} />
               <Route path="mypage/modify" element={<MyPageModify />} />
               <Route path="mypage/reviews" element={<MyPageReview />} />
               <Route path="mypage/travel-list" element={<MyPageTravelList />} />

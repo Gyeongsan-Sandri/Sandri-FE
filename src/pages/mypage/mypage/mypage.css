@@ -16,7 +16,7 @@
 
 .mypage-container {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
   background: var(--bg);
   color: var(--text);
   display: flex;
@@ -376,7 +376,6 @@
 @media (max-width: 420px) {
   .mypage-container {
     padding: 0;
-    padding-bottom: 65px;
   }
 
   .mypage-content {

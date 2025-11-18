@@ -129,7 +129,7 @@ function MyPage() {
   };
 
   const handlePointStoreClick = () => {
-    navigate('/collection');
+    navigate('/mypage/point-shop');
   };
 
   const handleTravelListClick = () => {

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PlaceList } from '../../../components/common';
+import { PlaceList, BackButton } from '../../../components/common';
 import './spot_category.css';
-import backIcon from '../../../assets/back_icon.svg';
+import official1 from '../../../assets/official/공식광고1.svg';
+import official2 from '../../../assets/official/공식광고2.svg';
+import official3 from '../../../assets/official/공식광고3.svg';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,9 +24,10 @@ const SpotCategory = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const pageSize = 10;
+  const [officialIndex, setOfficialIndex] = useState(0);
+  const officialAds = [official1, official2, official3];
 
   useEffect(() => {
-    // URL에서 전달된 카테고리가 있으면 해당 카테고리로 설정
     if (location.state?.category) {
       const matchedCategory = CATEGORIES.find(cat => cat.value === location.state.category);
       if (matchedCategory) {
@@ -35,6 +38,14 @@ const SpotCategory = () => {
     }
     fetchPlacesByCategory(CATEGORIES[0].value, 1, true);
   }, [location.state]);
+
+  // 공식 광고 자동 슬라이드
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setOfficialIndex((prev) => (prev + 1) % officialAds.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [officialAds.length]);
 
   const fetchPlacesByCategory = async (categoryValue, pageNum = 1, reset = false) => {
     setLoading(true);
@@ -70,7 +81,6 @@ const SpotCategory = () => {
             setPlaces(prev => [...prev, ...formattedPlaces]);
           }
           
-          // 더 이상 데이터가 없으면 hasMore를 false로 설정
           setHasMore(formattedPlaces.length === pageSize);
           setPage(pageNum);
         }
@@ -99,7 +109,7 @@ const SpotCategory = () => {
   const handleLike = async (placeId) => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/favorites/place/${placeId}`,
+        `${API_BASE_URL}/api/favorites/PLACE/${placeId}`,
         {
           method: 'POST',
           credentials: 'include'
@@ -131,9 +141,7 @@ const SpotCategory = () => {
     <div className="spot-category-container">
       {/* 헤더 */}
       <header className="spot-category-header">
-        <button className="back-btn" onClick={handleBack}>
-          <img src={backIcon} alt="뒤로가기" />
-        </button>
+        <BackButton onClick={handleBack} />
         <h1>{CATEGORIES.find(cat => cat.id === activeCategory)?.name || '자연/힐링'}</h1>
       </header>
 
@@ -150,13 +158,22 @@ const SpotCategory = () => {
         ))}
       </div>
 
-      {/* 광고 배너 */}
-      <div className="spot-banner">
-        <img 
-          src="https://placehold.co/600x300/4A90E2/FFFFFF?text=Gyeongsan+Cultural+Festival" 
-          alt="경산 축제 배너" 
-        />
-      </div>
+      {/* 공식 광고 캐러셀 */}
+      <section className="spot-official-ad">
+        <div className="official-ad-carousel">
+          <div
+            className="official-ad-track"
+            style={{ transform: `translateX(-${officialIndex * 304}px)` }}
+          >
+            {officialAds.map((src, idx) => (
+              <div key={idx} className="official-ad-slide">
+                <img src={src} alt={`공식 광고 ${idx + 1}`} />
+              </div>
+            ))}
+          </div>
+          <div className="official-ad-indicator">{officialIndex + 1} / {officialAds.length}</div>
+        </div>
+      </section>
 
       {/* 장소 목록 */}
       <div className="spot-content">
