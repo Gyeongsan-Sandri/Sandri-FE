@@ -23,14 +23,75 @@ import walkerImg from '../../../assets/test_result_img/walk.png';
 import galleryImg from '../../../assets/test_result_img/gallery.png';
 
 // 결과 설명 텍스트(raw) 임포트
-import adventureText from '@/assets/resultTexts/adventure.txt?raw';
-import fairyText from '@/assets/resultTexts/fairy.txt?raw';
-import hotplaceText from '@/assets/resultTexts/hotplace.txt?raw';
-import localText from '@/assets/resultTexts/local.txt?raw';
-import plannerText from '@/assets/resultTexts/planner.txt?raw';
-import turtleText from '@/assets/resultTexts/turtle.txt?raw';
-import walkerText from '@/assets/resultTexts/walker.txt?raw';
-import galleryText from '@/assets/resultTexts/gallery.txt?raw';
+// 결과 설명 텍스트 하드코딩
+const RESULT_TEXTS = {
+  adventure: `쉬는 건 집에서!
+여행은 발이 부르트도록 해야 제맛.
+
+여행을 통해 진짜 삶의 활력을 느끼는 타입이에요.
+관광지를 구경만 하는 게 아니라, 직접 부딪치고 경험하며 현지의 공기를 온몸으로 느끼는걸 좋아하죠. 시장 구석의 작은 분식집부터 지역 주민만 아는 명소까지, 로컬 감성을 탐험하듯 즐기는 여행자예요.
+
+계획표가 빽빽하더라도 괜찮아요. 몸은 고되어도 마음은 뿌듯하니까요.
+여행의 진짜 묘미는 발로 뛰는 시간에 있다고 믿는 열정 만렙 스타일입니다.`,
+  fairy: `내 여행 앨범은 곧 작품집!
+따스한 햇살 아래 카페 창가 자리에 앉아,
+커피 한 잔과 함께 하루를 천천히 음미해요.
+지도보다 발이 먼저 움직이고,
+계획표보다 분위기가 더 중요하죠.
+
+어딜 가도 카메라를 꺼내 들어 찰칵-
+앨범 한 켠이 작품으로 채워져요.
+
+빡빡한 일정 대신 여유로운 '쉼'을
+여행의 주제로 삼는 당신!
+아마 여행이 끝나도 그 순간의 공기와 온도를
+오래도록 기억할 거예요. 🌸`,
+  hotplace: `여행의 하이라이트는 사진 속 한 컷!
+
+핫플 헌터는 어디서든 감각적이고 인기 있는 장소를 찾아내는 능력을 가진 타입이에요.
+트렌디한 카페, 예쁜 포토존, 유명 전시회나 공연장 등,
+SNS에서 본 핫플이라면 놓치지 않죠.
+
+하루 일정을 꼼꼼히 계획하고, 각 장소의 감성을 완벽히 담아내는 데 집중해야 하죠.
+단순한 방문이 아니라 나만의 여행 앨범을 완성해가는 과정에서 행복을 느끼는 타입이에요.
+여행은 나를 표현하는 하나의 콘텐츠라고 생각하죠.`,
+  local: `관광도 좋지만, 진짜는 골목길에  있다.
+
+현지인은 빠르게 돌아보는 여행보다는, '그것에서 살아보는 듯한 여행'을 선호하는 타입이에요.
+새벽 시장에서 현지 음식을 맛보고, 낯선 골목의 벽화와 사람들 속을 느긋하게 걸으며 시간을 보내는 걸 좋아하죠.
+가이드북보다 주민의 추천이 더 믿음직하고, 계획보다는 감각으로 움직이죠.
+
+그 도시의 공기를 내 속에 담는 것.
+현지인은 진짜 여행의 맛을 아는 여유로운 여행자예요.`,
+  planner: `여행은 준비 70%, 실행 30%.
+
+철저 플래너는 완벽한 여행을 위해 사전에 모든 것을 세세하게 계획하는 타입이에요.
+
+맛집 예약부터 입장 시간, 이동 동선까지 꼼곰하게 정리해야 마음이 놓이죠. 미술관, 전통 체험, 박물관처럼 실내 중심의 일정을 빽빽하게 채워 넣습니다.
+즉흥적인 변화보다 예측 가능한 일정에서 안정감을 느끼는 편이에요.
+
+여행의 즐거움은 계획한대로 완벽히 실현되는 순간에 있다고 믿는 스타일입니다.`,
+  turtle: `여행도 결국은 힐링이 우선!
+
+여행은 마라톤이 아니라, 아주 길고 달콤한 낮잠 같아야 한다고 생각하는 당신!
+
+당신의 여행 가방 속에는 빡빡한 일정 대신 느긋함과 여유만 가득합니다.
+분주하게 돌아다니기보다 숙소 근처 맛집을 탐방하고,
+카페에서 책을 읽거나 음악을 들으며 천천히 시간을 보내는 걸 좋아해요.
+빠르게 움직이기보단, 느린 속도로 현지의 공기와 정취를 온전히 느끼며 머무르는 걸 즐겨요.`,
+  walker: `산책가 설명 텍스트가 여기에 들어갑니다.
+파일을 업데이트해주세요.`,
+  gallery: `내 일정은 곧 아트 전시회.
+
+갤러리피플은 감성을 에너지로 삼는 예술형 여행자에요.
+전시회, 독립서점, 카페투어, 맛집까지 하루를 알차게 채우며
+새로운 영감과 감정의 자극을 찾아다닙니다.
+
+여행을 기록의 시간으로 여겨
+사진, 글, 영상 등 자신만의 방식으로 그날의 감정을 남기죠.
+
+감각적인 취향과 디테일한 일정 구성에 강한 자신감을 가진 타입니다.`,
+};
 
 function Test() {
   const navigate = useNavigate();
@@ -110,14 +171,14 @@ function Test() {
   ];
 
   const resultMapping = {
-    'outdoor-tight-local': { type: '모험왕', image: adventureImg, text: adventureText, apiType: 'ADVENTURER' },
-    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, text: fairyText, apiType: 'SENSITIVE_FAIRY' },
-    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, text: hotplaceText, apiType: 'HOTSPOT_HUNTER' },
-    'outdoor-relaxed-local': { type: '현지인', image: localImg, text: localText, apiType: 'LOCAL' },
-    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, text: plannerText, apiType: 'THOROUGH_PLANNER' },
-    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, text: turtleText, apiType: 'HEALING_TURTLE' },
-    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, text: walkerText, apiType: 'WALKER' },
-    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, text: galleryText, apiType: 'GALLERY_PEOPLE' }
+    'outdoor-tight-local': { type: '모험왕', image: adventureImg, text: RESULT_TEXTS.adventure, apiType: 'ADVENTURER' },
+    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, text: RESULT_TEXTS.fairy, apiType: 'SENSITIVE_FAIRY' },
+    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, text: RESULT_TEXTS.hotplace, apiType: 'HOTSPOT_HUNTER' },
+    'outdoor-relaxed-local': { type: '현지인', image: localImg, text: RESULT_TEXTS.local, apiType: 'LOCAL' },
+    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, text: RESULT_TEXTS.planner, apiType: 'THOROUGH_PLANNER' },
+    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, text: RESULT_TEXTS.turtle, apiType: 'HEALING_TURTLE' },
+    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, text: RESULT_TEXTS.walker, apiType: 'WALKER' },
+    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, text: RESULT_TEXTS.gallery, apiType: 'GALLERY_PEOPLE' }
   };
 
   const calculateResult = (userAnswers) => {
