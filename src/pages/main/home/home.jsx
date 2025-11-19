@@ -20,7 +20,6 @@ const Home = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [officialIndex, setOfficialIndex] = useState(0);
-  const [visitIndex, setVisitIndex] = useState(0);
   const officialAds = [official1, official2, official3];
 
   useEffect(() => {
@@ -77,7 +76,6 @@ const Home = () => {
         const visitData = await visitResponse.json();
         if (visitData.success && visitData.data) {
           setTodayRoutes(visitData.data);
-          setVisitIndex(0);
         }
       }
     } catch (error) {
@@ -154,49 +152,74 @@ const Home = () => {
   };
 
   // 방문 확정하기
-  const handleConfirmVisit = async (visit) => {
+  const handleConfirmVisit = async (place) => {
     try {
-      const placeInfo = visit?.placeInfo;
-      if (!placeInfo?.placeName) {
-        alert('장소 정보가 없습니다.');
+      // 1. 현재 위치 가져오기
+      if (!navigator.geolocation) {
+        alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
         return;
       }
 
-      // 이름으로 장소 검색하여 placeId 확보
-      const searchRes = await fetch(
-        `${API_BASE_URL}/api/places/search?keyword=${encodeURIComponent(placeInfo.placeName)}`,
-        { method: 'GET', credentials: 'include' }
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const currentLat = position.coords.latitude;
+          const currentLon = position.coords.longitude;
+
+          // 2. 사용자 위치 업데이트
+          try {
+            await fetch(`${API_BASE_URL}/api/user/location`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                latitude: currentLat,
+                longitude: currentLon
+              })
+            });
+          } catch (err) {
+            console.error('위치 업데이트 실패:', err);
+          }
+
+          // 3. 장소와의 거리 확인
+          if (!isWithinRange(currentLat, currentLon, place.latitude, place.longitude)) {
+            alert(`장소로부터 너무 멀리 떨어져 있습니다.\n${place.name} 근처에서 다시 시도해주세요.`);
+            return;
+          }
+
+          // 4. 방문 장소 저장
+          const visitResponse = await fetch(`${API_BASE_URL}/api/user/visited-places`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              placeId: place.placeId,
+              visitedAt: new Date().toISOString()
+            })
+          });
+
+          if (visitResponse.ok) {
+            alert(`${place.name} 방문이 확정되었습니다!`);
+            // 루트 목록 새로고침
+            fetchData();
+          } else {
+            const errorData = await visitResponse.json();
+            alert(errorData.message || '방문 확정에 실패했습니다.');
+          }
+        },
+        (error) => {
+          console.error('위치 정보 가져오기 실패:', error);
+          alert('위치 정보를 가져올 수 없습니다. 위치 서비스를 활성화해주세요.');
+        },
+        {
+          enableHighAccuracy: true, // 고정확도 모드
+          timeout: 10000,
+          maximumAge: 0
+        }
       );
-
-      if (!searchRes.ok) {
-        alert('장소 정보를 찾을 수 없습니다.');
-        return;
-      }
-      const searchJson = await searchRes.json();
-      const first = searchJson?.data?.[0];
-      if (!first?.placeId) {
-        alert('장소 ID를 찾을 수 없습니다.');
-        return;
-      }
-
-      // 방문 확정 저장 (거리 체크 없이 서버 검증에 위임)
-      const confirmRes = await fetch(`${API_BASE_URL}/api/user/visited-places`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          placeId: first.placeId,
-          visitedAt: new Date().toISOString()
-        })
-      });
-
-      if (confirmRes.ok) {
-        alert(`${placeInfo.placeName} 방문이 확정되었습니다!`);
-        fetchData();
-      } else {
-        const err = await confirmRes.json().catch(() => null);
-        alert(err?.message || '방문 확정에 실패했습니다.');
-      }
     } catch (error) {
       console.error('방문 확정 오류:', error);
       alert('오류가 발생했습니다. 다시 시도해주세요.');
@@ -292,42 +315,27 @@ const Home = () => {
           <div className="section-header">
             <h2>오늘의 일정</h2>
           </div>
-          {/* 단일 카드 캐러셀 */}
-          {(() => {
-            const visit = todayRoutes[visitIndex];
-            return (
-              <div className="visit-card">
-                <div className="visit-card-inner">
-                  <div className="visit-image">
-                    <img
-                      src={visit.placeInfo.thumbnail || 'https://placehold.co/300x200'}
-                      alt={visit.placeInfo.placeName}
-                    />
-                    <div className="visit-badge">{(visit.visitOrder ?? visitIndex) + 1}</div>
-                  </div>
-                  <div className="visit-info">
-                    <h3 className="visit-title">{visit.placeInfo.placeName}</h3>
-                    <p className="visit-address">{visit.placeInfo.address}</p>
-                    <button
-                      className="visit-confirm-cta"
-                      onClick={() => handleConfirmVisit(visit)}
-                    >
-                      방문 확정하기
-                    </button>
-                  </div>
+          <div className="today-schedule-slider">
+            {todayRoutes.map((visit, index) => (
+              <div key={index} className="today-schedule-card">
+                <div className="today-schedule-image">
+                  <img 
+                    src={visit.placeInfo.thumbnail || 'https://placehold.co/300x200'} 
+                    alt={visit.placeInfo.placeName} 
+                  />
+                </div>
+                <div className="today-schedule-info">
+                  <div className="visit-order-badge">{visit.visitOrder}/{visit.totalPlaceCount}</div>
+                  <h3>{visit.placeInfo.placeName}</h3>
+                  <p className="today-schedule-address">{visit.placeInfo.address}</p>
+                  <button 
+                    className="visit-confirm-btn"
+                    onClick={() => handleConfirmVisit(visit.placeInfo)}
+                  >
+                    방문 확정하기
+                  </button>
                 </div>
               </div>
-            );
-          })()}
-          {/* 인디케이터 */}
-          <div className="visit-dots">
-            {todayRoutes.map((_, i) => (
-              <button
-                key={i}
-                className={`visit-dot ${i === visitIndex ? 'active' : ''}`}
-                onClick={() => setVisitIndex(i)}
-                aria-label={`오늘의 일정 ${i + 1}`}
-              />
             ))}
           </div>
         </section>
