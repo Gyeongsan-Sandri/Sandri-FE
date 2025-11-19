@@ -4,7 +4,7 @@ import './MainLayout.css';
 
 function MainLayout() {
   const location = useLocation();
-  const hideNavPaths = ['/users/login', '/users/register', '/test'];
+  const hideNavPaths = ['/users/login', '/users/register', '/test', '/];
   const baseHide = hideNavPaths.some(path => location.pathname.startsWith(path));
   const isRouteDetail = /^\/routes\/(?!list$|search$).+/.test(location.pathname);
   const shouldHideNav = baseHide || isRouteDetail;

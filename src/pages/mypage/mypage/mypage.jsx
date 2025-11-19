@@ -46,7 +46,7 @@ function MyPage() {
   });
   const [reviewCount, setReviewCount] = useState(0);
   const [visitedPlaces, setVisitedPlaces] = useState([]);
-  const [points, setPoints] = useState(0);
+  // const [points, setPoints] = useState(0);
 
   // 사용자 프로필 조회
   const fetchUserProfile = async () => {
@@ -66,8 +66,6 @@ function MyPage() {
             profileImage: result.data.profileImage || null,
             travelStyle: result.data.travelStyle || null
           });
-          // 포인트 반영
-          setPoints(typeof result.data.point === 'number' ? result.data.point : 0);
         }
       } else {
         console.error('프로필 조회 실패');
@@ -236,7 +234,7 @@ function MyPage() {
           <div className="points-header" onClick={() => console.log('포인트 상세')}>
             <h3 className="points-title">내 포인트</h3>
             <div className="points-right">
-              <span className="points-value">{points.toLocaleString()} P</span>
+              <span className="points-value">{/* points.toLocaleString() */}0 P</span>
             </div>
           </div>
           <div className="points-store" onClick={handlePointStoreClick}>

@@ -398,19 +398,3 @@
   border-radius: 12px;
   width: fit-content;
 }
-
-/* 더보기 */
-.load-more-container {
-  display: flex;
-  justify-content: center;
-}
-
-.load-more-btn {
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
