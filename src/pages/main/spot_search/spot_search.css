@@ -362,6 +362,23 @@
   object-fit: cover;
 }
 
+/* 순번 배지 */
+.result-rank-badge {
+  position: absolute;
+  margin: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
 .result-info {
   flex: 1;
   display: flex;
@@ -397,4 +414,57 @@
   font-weight: 600;
   border-radius: 12px;
   width: fit-content;
+}
+
+/* 태그 그룹 */
+.result-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.result-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+/* 우측 하트 영역 */
+.search-result-card {
+  position: relative;
+}
+
+.result-like {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-heart {
+  background: transparent;
+}
+
+/* 더보기 */
+.search-load-more {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.load-more-btn {
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

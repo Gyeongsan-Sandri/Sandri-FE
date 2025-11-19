@@ -321,16 +321,28 @@ function RouteList() {
         <div className="hot-routes-list">
           {hotRoutes.map((route) => (
             <div 
-              key={route.id} 
-              className="hot-route-item"
-              onClick={() => handleRouteClick(route.id)}
+              key={route.routeId || route.id}
+              className="hot-route-card"
+              onClick={() => handleRouteClick(route.routeId || route.id)}
             >
-              <div className="hot-route-content">
-                <h3 className="hot-route-title">{route.title}</h3>
-                <p className="hot-route-creator">by {route.creatorNickname || route.creatorName}</p>
-                <p className="hot-route-date">
-                  {route.startDate} - {route.endDate}
-                </p>
+              <div className="hot-thumb">
+                <img 
+                  src={route.imageUrl || 'https://placehold.co/120x120'} 
+                  alt={route.title}
+                />
+                {typeof route.rank === 'number' && (
+                  <div className={`hot-rank rank-${route.rank}`}>{route.rank}</div>
+                )}
+              </div>
+              <div className="hot-info">
+                <h3 className="hot-title">{route.title}</h3>
+                <p className="hot-date">{route.startDate} - {route.endDate}</p>
+                <div className="hot-meta">
+                  <span className="hot-creator">by {route.creatorNickname || route.creatorName || '알 수 없음'}</span>
+                  {typeof route.recentLikes === 'number' && (
+                    <span className="hot-badge">HOT</span>
+                  )}
+                </div>
               </div>
             </div>
           ))}
