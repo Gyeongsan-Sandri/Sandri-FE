@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './spot_search.css';
 import { BackButton } from '../../../components/common';
+import LikeHeart from '../../../components/LikeHeart/LikeHeart.jsx';
 import searchIcon from '../../../assets/search.svg';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -16,6 +17,9 @@ const SpotSearch = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [size] = useState(10);
+  const [hasNext, setHasNext] = useState(false);
 
   // 최근 검색어 조회
   const fetchRecentSearches = async () => {
@@ -138,7 +142,7 @@ const SpotSearch = () => {
   };
 
   // 검색 실행
-  const handleSearch = async (keyword = searchKeyword) => {
+  const handleSearch = async (keyword = searchKeyword, mode = 'reset') => {
     if (!keyword.trim()) return;
 
     setIsSearching(true);
@@ -148,7 +152,9 @@ const SpotSearch = () => {
 
       // 장소 검색
       const params = new URLSearchParams({
-        keyword: keyword
+        keyword: keyword,
+        page: mode === 'append' ? String(page + 1) : '1',
+        size: String(size)
       });
 
       if (selectedFilters.length > 0) {
@@ -165,7 +171,19 @@ const SpotSearch = () => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
-          setSearchResults(data.data);
+          const places = Array.isArray(data.data.places) ? data.data.places : [];
+          const normalized = places.map((p) => ({
+            ...p,
+            isLiked: !!p.isLiked
+          }));
+          if (mode === 'append') {
+            setSearchResults((prev) => [...prev, ...normalized]);
+            setPage((prev) => prev + 1);
+          } else {
+            setSearchResults(normalized);
+            setPage(1);
+          }
+          setHasNext(!!data.data.hasNext);
           setHasSearched(true);
           await fetchRecentSearches(); // 최근 검색어 새로고침
         }
@@ -174,6 +192,29 @@ const SpotSearch = () => {
       console.error('검색 실패:', error);
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const loadMore = async () => {
+    if (!hasNext || isSearching) return;
+    await handleSearch(searchKeyword, 'append');
+  };
+
+  // 좋아요 토글
+  const togglePlaceLike = async (e, placeId, currentLike) => {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/favorites/place/${placeId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ data: !currentLike })
+      });
+      if (response.ok) {
+        setSearchResults((prev) => prev.map((p) => p.placeId === placeId ? { ...p, isLiked: !currentLike } : p));
+      }
+    } catch (err) {
+      console.error('Like toggle failed:', err);
     }
   };
 
@@ -255,8 +296,9 @@ const SpotSearch = () => {
           {isSearching ? (
             <div className="search-loading">검색 중...</div>
           ) : searchResults.length > 0 ? (
+            <>
             <div className="search-results-grid">
-              {searchResults.map((place) => (
+              {searchResults.map((place, idx) => (
                 <div 
                   key={place.placeId} 
                   className="search-result-card"
@@ -267,17 +309,41 @@ const SpotSearch = () => {
                       src={place.thumbnailUrl || 'https://placehold.co/300x200'} 
                       alt={place.name} 
                     />
+                    <div className="result-rank-badge">{idx + 1}</div>
                   </div>
                   <div className="result-info">
                     <h3>{place.name}</h3>
                     <p className="result-address">{place.address}</p>
-                    {place.categoryName && (
-                      <span className="result-category">#{place.categoryName}</span>
-                    )}
+                    <div className="result-tags">
+                      {place.categoryName && (
+                        <span className="result-tag">{place.categoryName}</span>
+                      )}
+                      {place.groupName && (
+                        <span className="result-tag">{place.groupName}</span>
+                      )}
+                      {Array.isArray(place.hashtags) && [...new Set(place.hashtags)].slice(0, 2).map((tag, i) => (
+                        <span key={i} className="result-tag">{tag.replace('#', '')}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="result-like">
+                    <LikeHeart
+                      isLiked={!!place.isLiked}
+                      onToggle={(e) => togglePlaceLike(e, place.placeId, !!place.isLiked)}
+                      size={20}
+                      containerSize={32}
+                      className="result-heart"
+                    />
                   </div>
                 </div>
               ))}
             </div>
+            {hasNext && (
+              <div className="search-load-more">
+                <button className="load-more-btn" onClick={loadMore} disabled={isSearching}>더보기</button>
+              </div>
+            )}
+            </>
           ) : (
             <div className="empty-message">검색 결과가 없습니다.</div>
           )}
