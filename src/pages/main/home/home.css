@@ -12,9 +12,13 @@
   margin: 0 auto;
   background: white;
   box-sizing: border-box;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* 공통 프레임 내부에서는 중복 테두리 제거 */
+.content-frame .home-wrapper {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* 로딩 */
