@@ -325,7 +325,7 @@ const Home = () => {
                   />
                 </div>
                 <div className="today-schedule-info">
-                  <div className="visit-order-badge">{visit.visitOrder}/{visit.totalPlaceCount}</div>
+                  <div className="visit-order-badge">{visit.visitOrder + 1}/{visit.totalPlaceCount}</div>
                   <h3>{visit.placeInfo.placeName}</h3>
                   <p className="today-schedule-address">{visit.placeInfo.address}</p>
                   <button 
