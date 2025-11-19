@@ -16,6 +16,9 @@ const SpotSearch = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [size] = useState(10);
+  const [hasNext, setHasNext] = useState(false);
 
   // 최근 검색어 조회
   const fetchRecentSearches = async () => {
@@ -138,24 +141,25 @@ const SpotSearch = () => {
   };
 
   // 검색 실행
-  const handleSearch = async (keyword = searchKeyword) => {
+  const handleSearch = async (keyword = searchKeyword, mode = 'reset') => {
     if (!keyword.trim()) return;
 
     setIsSearching(true);
     try {
-      // 최근 검색어에 추가
-      await addRecentSearch(keyword);
-
-      // 장소 검색
-      const params = new URLSearchParams({
-        keyword: keyword
-      });
-
-      if (selectedFilters.length > 0) {
-        selectedFilters.forEach(filter => {
-          params.append('category', filter);
-        });
+      // 새 검색 시작 시 최근 검색어에 추가
+      if (mode === 'reset') {
+        await addRecentSearch(keyword);
       }
+
+      // 장소 검색 (페이지/사이즈 포함)
+      const nextPage = mode === 'reset' ? 1 : page;
+      const params = new URLSearchParams();
+      params.append('keyword', keyword);
+      if (selectedFilters.length > 0) {
+        selectedFilters.forEach(filter => params.append('category', filter));
+      }
+      params.append('page', String(nextPage));
+      params.append('size', String(size));
 
       const response = await fetch(`${API_BASE_URL}/api/places/search?${params.toString()}`, {
         method: 'GET',
@@ -165,9 +169,14 @@ const SpotSearch = () => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
-          setSearchResults(data.data);
+          const list = data.data.places || [];
+          setSearchResults(prev => (mode === 'reset' ? list : [...prev, ...list]));
           setHasSearched(true);
-          await fetchRecentSearches(); // 최근 검색어 새로고침
+          setHasNext(Boolean(data.data.hasNext));
+          setPage(nextPage + 1);
+          if (mode === 'reset') {
+            await fetchRecentSearches();
+          }
         }
       }
     } catch (error) {
@@ -192,13 +201,15 @@ const SpotSearch = () => {
   // 최근 검색어 클릭
   const handleRecentSearchClick = (keyword) => {
     setSearchKeyword(keyword);
-    handleSearch(keyword);
+    setPage(1);
+    handleSearch(keyword, 'reset');
   };
 
   // 인기 검색어 클릭
   const handlePopularSearchClick = (keyword) => {
     setSearchKeyword(keyword);
-    handleSearch(keyword);
+    setPage(1);
+    handleSearch(keyword, 'reset');
   };
 
   // 필터 제거
@@ -247,12 +258,14 @@ const SpotSearch = () => {
               setHasSearched(false);
               setSearchResults([]);
               setSearchKeyword('');
+              setPage(1);
+              setHasNext(false);
             }}>
               ×
             </button>
           </div>
           
-          {isSearching ? (
+          {isSearching && searchResults.length === 0 ? (
             <div className="search-loading">검색 중...</div>
           ) : searchResults.length > 0 ? (
             <div className="search-results-grid">
@@ -277,6 +290,17 @@ const SpotSearch = () => {
                   </div>
                 </div>
               ))}
+              {hasNext && (
+                <div className="load-more-container" style={{ marginTop: '8px' }}>
+                  <button 
+                    className="load-more-btn" 
+                    onClick={() => handleSearch(searchKeyword, 'append')} 
+                    disabled={isSearching}
+                  >
+                    {isSearching ? '로딩 중...' : '더보기'}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="empty-message">검색 결과가 없습니다.</div>
