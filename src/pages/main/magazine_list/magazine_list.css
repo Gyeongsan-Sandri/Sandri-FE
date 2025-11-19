@@ -22,3 +22,15 @@
 .maglist-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 4px 12px}
 .maglist-tag{font-size:11px;color:#6b7280}
 .maglist-empty{padding:40px 16px;color:#6b7280;text-align:center}
+
+.BackButton {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}

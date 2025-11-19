@@ -67,7 +67,7 @@ function MyRoute() {
     }
   };
 
-  // 장소 목록(검색 API 기반) 조회
+  // 장소 목록(전체) 조회
   const fetchPlaces = async (mode = 'append') => {
     if (placesLoading) return;
     setPlacesLoading(true);
@@ -78,15 +78,15 @@ function MyRoute() {
       params.append('page', mode === 'reset' ? '1' : String(placesPage));
       params.append('size', '10');
 
-      const url = `${API_BASE_URL}/api/places/search?${params.toString()}`;
+      const url = `${API_BASE_URL}/api/places?${params.toString()}`;
       const response = await fetch(url, { method: 'GET', credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
-          const list = data.data.places || [];
+          const list = data.data;
           const merged = mode === 'reset' ? list : [...searchPlaces, ...list];
           setSearchPlaces(merged);
-          setPlacesHasMore(Boolean(data.data.hasNext));
+          setPlacesHasMore(list.length === 10);
           setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
         }
       }
@@ -174,11 +174,6 @@ function MyRoute() {
       console.error('공유 링크 생성 에러:', error);
       alert('공유 링크 생성에 실패했습니다.');
     }
-  };
-
-  // 교통 예매 외부 링크
-  const handleReserveTransport = () => {
-    window.open('https://www.korail.com/ticket/search/general', '_blank');
   };
 
   // 일행 목록 조회
@@ -474,7 +469,7 @@ function MyRoute() {
               <img src={companionIcon} alt="일행 추가" className="btn-icon" />
               일행 추가
             </button>
-            <button className="schedule-action-btn" onClick={handleReserveTransport}>
+            <button className="schedule-action-btn">
               <img src={busIcon} alt="버스예약" className="btn-icon" />
               버스/기차 예매
             </button>
