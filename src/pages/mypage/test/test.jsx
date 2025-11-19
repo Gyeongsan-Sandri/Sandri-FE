@@ -22,12 +22,25 @@ import turtleImg from '../../../assets/test_result_img/turtle.png';
 import walkerImg from '../../../assets/test_result_img/walk.png';
 import galleryImg from '../../../assets/test_result_img/gallery.png';
 
+// 결과 설명 텍스트(raw) 임포트
+import adventureText from '@/assets/resultTexts/adventure.txt?raw';
+import fairyText from '@/assets/resultTexts/fairy.txt?raw';
+import hotplaceText from '@/assets/resultTexts/hotplace.txt?raw';
+import localText from '@/assets/resultTexts/local.txt?raw';
+import plannerText from '@/assets/resultTexts/planner.txt?raw';
+import turtleText from '@/assets/resultTexts/turtle.txt?raw';
+import walkerText from '@/assets/resultTexts/walker.txt?raw';
+import galleryText from '@/assets/resultTexts/gallery.txt?raw';
+
 function Test() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [nickname, setNickname] = useState('사용자');
   const [resultDescription, setResultDescription] = useState('');
+  const [recommendedSpots, setRecommendedSpots] = useState([]);
+  const [isLoadingSpots, setIsLoadingSpots] = useState(false);
+  const [spotsError, setSpotsError] = useState('');
 
   // 질문 데이터
   const questions = [
@@ -97,14 +110,14 @@ function Test() {
   ];
 
   const resultMapping = {
-    'outdoor-tight-local': { type: '모험왕', image: adventureImg, file: '../../../public/adventure.txt', apiType: 'ADVENTURER' },
-    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, file: '../../../public/fairy.txt', apiType: 'SENSITIVE_FAIRY' },
-    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, file: '../../../public/hotplace.txt', apiType: 'HOTSPOT_HUNTER' },
-    'outdoor-relaxed-local': { type: '현지인', image: localImg, file: '../../../public/local.txt', apiType: 'LOCAL' },
-    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, file: '../../../public/planner.txt', apiType: 'THOROUGH_PLANNER' },
-    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, file: '../../../public/turtle.txt', apiType: 'HEALING_TURTLE' },
-    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, file: '../../../public/walker.txt', apiType: 'WALKER' },
-    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, file: '../../../public/gallery.txt', apiType: 'GALLERY_PEOPLE' }
+    'outdoor-tight-local': { type: '모험왕', image: adventureImg, text: adventureText, apiType: 'ADVENTURER' },
+    'indoor-relaxed-aesthetic': { type: '감성요정', image: fairyImg, text: fairyText, apiType: 'SENSITIVE_FAIRY' },
+    'outdoor-tight-aesthetic': { type: '핫플 헌터', image: hotplaceImg, text: hotplaceText, apiType: 'HOTSPOT_HUNTER' },
+    'outdoor-relaxed-local': { type: '현지인', image: localImg, text: localText, apiType: 'LOCAL' },
+    'indoor-tight-local': { type: '철저 플래너', image: plannerImg, text: plannerText, apiType: 'THOROUGH_PLANNER' },
+    'indoor-relaxed-local': { type: '힐링 거북이', image: turtleImg, text: turtleText, apiType: 'HEALING_TURTLE' },
+    'outdoor-relaxed-aesthetic': { type: '산책가', image: walkerImg, text: walkerText, apiType: 'WALKER' },
+    'indoor-tight-aesthetic': { type: '갤러리피플', image: galleryImg, text: galleryText, apiType: 'GALLERY_PEOPLE' }
   };
 
   const calculateResult = (userAnswers) => {
@@ -142,6 +155,33 @@ function Test() {
     }
   };
 
+  // 여행스타일별 추천 관광지 조회
+  const fetchRecommendedSpots = async (travelStyle) => {
+    setIsLoadingSpots(true);
+    setSpotsError('');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/travel-style/${travelStyle}/places`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('추천 관광지 호출 실패');
+      }
+      const result = await response.json();
+      if (result && result.success && Array.isArray(result.data)) {
+        setRecommendedSpots(result.data);
+      } else {
+        setRecommendedSpots([]);
+      }
+    } catch (error) {
+      console.error('추천 관광지 조회 에러:', error);
+      setSpotsError('추천 관광지를 불러오지 못했어요.');
+      setRecommendedSpots([]);
+    } finally {
+      setIsLoadingSpots(false);
+    }
+  };
+
   // 사용자 프로필 조회하여 닉네임 가져오기
   const fetchUserProfile = async () => {
     try {
@@ -171,14 +211,11 @@ function Test() {
       const result = calculateResult(answers);
       sendResultToBackend(result.apiType);
       
-      // 결과 설명 텍스트 로드
-      fetch(`/${result.file}`)
-        .then(response => response.text())
-        .then(text => setResultDescription(text))
-        .catch(error => {
-          console.error('결과 설명 로드 실패:', error);
-          setResultDescription('결과 설명을 불러올 수 없습니다.');
-        });
+      // 결과 설명 텍스트는 번들 시점에 raw로 임포트된 문자열 사용
+      setResultDescription(result.text || '');
+
+      // 추천 관광지 호출
+      fetchRecommendedSpots(result.apiType);
     } 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
@@ -245,13 +282,6 @@ function Test() {
   const renderResult = () => {
     const result = calculateResult(answers);
     
-    const tourSpots = [
-      { id: 1, name: 'tourspot1' },
-      { id: 2, name: 'tourspot2' },
-      { id: 3, name: 'tourspot3' },
-      { id: 4, name: 'tourspot4' },
-    ];
-    
     return (
       <div className="test-container result-scrollable">
         <button className="back-button" onClick={() => navigate('/mypage')}>
@@ -275,14 +305,33 @@ function Test() {
               <span className="highlight">{result.type}</span>에게 맞는 맞춤 관광지!
             </h2>
             <div className="tourspot-scroll-container">
-              {tourSpots.map(spot => (
-                <div key={spot.id} className="tourspot-card">
-                  <div className="tourspot-placeholder">
-                    이미지 준비중
-                  </div>
-                  <p className="tourspot-name">{spot.name}</p>
+              {isLoadingSpots && (
+                <div className="tourspot-card">
+                  <div className="tourspot-placeholder">불러오는 중...</div>
                 </div>
-              ))}
+              )}
+              {!isLoadingSpots && spotsError && (
+                <div className="tourspot-card">
+                  <div className="tourspot-placeholder">{spotsError}</div>
+                </div>
+              )}
+              {!isLoadingSpots && !spotsError && recommendedSpots.length === 0 && (
+                <div className="tourspot-card">
+                  <div className="tourspot-placeholder">추천 데이터가 없어요</div>
+                </div>
+              )}
+              {!isLoadingSpots && !spotsError && recommendedSpots.length > 0 && (
+                recommendedSpots.slice(0, 3).map((spot) => (
+                  <div key={spot.placeId} className="tourspot-card">
+                    {spot.thumbnailUrl ? (
+                      <img src={spot.thumbnailUrl} alt={spot.name} className="tourspot-image" />
+                    ) : (
+                      <div className="tourspot-placeholder">이미지 없음</div>
+                    )}
+                    <p className="tourspot-name">{spot.name}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
