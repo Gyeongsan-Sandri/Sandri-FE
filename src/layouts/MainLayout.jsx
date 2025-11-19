@@ -6,8 +6,11 @@ function MainLayout() {
   const location = useLocation();
   
   // 하단 네비게이션을 숨길 경로들
-  const hideNavPaths = ['/users/login', '/users/register', '/test', '/routes/'];
-  const shouldHideNav = hideNavPaths.some(path => location.pathname.startsWith(path));
+  const hideNavPaths = ['/users/login', '/users/register', '/test'];
+  const baseHide = hideNavPaths.some(path => location.pathname.startsWith(path));
+  // Hide on route detail pages like /routes/:routeId (but not /routes, /routes/list, /routes/search)
+  const isRouteDetail = /^\/routes\/(?!list$|search$).+/.test(location.pathname);
+  const shouldHideNav = baseHide || isRouteDetail;
 
   return (
     <div className="main-layout">
