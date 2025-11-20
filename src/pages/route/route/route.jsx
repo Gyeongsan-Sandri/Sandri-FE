@@ -87,10 +87,11 @@ function MyRoute() {
         }
         setSearchPlaces(places);
         setPlacesHasMore(false);
-      } else {
+      } else if (searchQuery.trim()) {
+        // 키워드 검색 (검색어가 있을 때)
         const params = new URLSearchParams();
+        params.append('keyword', searchQuery.trim());
         if (selectedCategory !== '전체') params.append('category', selectedCategory);
-        if (searchQuery.trim()) params.append('keyword', searchQuery.trim());
         params.append('page', mode === 'reset' ? '1' : String(placesPage));
         params.append('size', '10');
 
@@ -103,6 +104,28 @@ function MyRoute() {
             const merged = mode === 'reset' ? places : [...searchPlaces, ...places];
             setSearchPlaces(merged);
             setPlacesHasMore(!!data.data.hasNext || places.length === 10);
+            setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
+          }
+        }
+      } else {
+        // 카테고리별 조회 (검색어가 없을 때)
+        const params = new URLSearchParams();
+        if (selectedCategory !== '전체') params.append('category', selectedCategory);
+        params.append('count', '10');
+        if (mode !== 'reset' && searchPlaces.length > 0) {
+          const lastPlace = searchPlaces[searchPlaces.length - 1];
+          params.append('lastPlaceId', String(lastPlace.placeId || lastPlace.id));
+        }
+
+        url = `${API_BASE_URL}/api/places?${params.toString()}`;
+        const response = await fetch(url, { method: 'GET', credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            places = Array.isArray(data.data.places) ? data.data.places : (Array.isArray(data.data) ? data.data : []);
+            const merged = mode === 'reset' ? places : [...searchPlaces, ...places];
+            setSearchPlaces(merged);
+            setPlacesHasMore(places.length === 10);
             setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
           }
         }
