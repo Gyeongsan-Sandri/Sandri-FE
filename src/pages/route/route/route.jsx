@@ -38,7 +38,7 @@ function MyRoute() {
   const [activeMemoId, setActiveMemoId] = useState(null);
   const [memoText, setMemoText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState('관심');
   const [searchPlaces, setSearchPlaces] = useState([]);
   const [placesPage, setPlacesPage] = useState(1);
   const [placesHasMore, setPlacesHasMore] = useState(true);
@@ -67,33 +67,73 @@ function MyRoute() {
     }
   };
 
-  // 장소 목록(전체) 조회
+  // 장소 목록 조회
   const fetchPlaces = async (mode = 'append') => {
     if (placesLoading) return;
     setPlacesLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedCategory !== '전체') params.append('category', selectedCategory);
-      if (searchQuery.trim()) params.append('keyword', searchQuery.trim());
-      params.append('page', mode === 'reset' ? '1' : String(placesPage));
-      params.append('size', '10');
+      let url;
+      let places = [];
 
-      const url = `${API_BASE_URL}/api/places?${params.toString()}`;
-      const response = await fetch(url, { method: 'GET', credentials: 'include' });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          const list = data.data;
-          const merged = mode === 'reset' ? list : [...searchPlaces, ...list];
-          setSearchPlaces(merged);
-          setPlacesHasMore(list.length === 10);
-          setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
+      if (selectedCategory === '관심') {
+        // 관심 목록 조회
+        url = `${API_BASE_URL}/api/favorites`;
+        const response = await fetch(url, { method: 'GET', credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data && data.data.places) {
+            places = data.data.places;
+          }
+        }
+        setSearchPlaces(places);
+        setPlacesHasMore(false);
+      } else {
+        const params = new URLSearchParams();
+        if (selectedCategory !== '전체') params.append('category', selectedCategory);
+        if (searchQuery.trim()) params.append('keyword', searchQuery.trim());
+        params.append('page', mode === 'reset' ? '1' : String(placesPage));
+        params.append('size', '10');
+
+        url = `${API_BASE_URL}/api/places/search?${params.toString()}`;
+        const response = await fetch(url, { method: 'GET', credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            places = Array.isArray(data.data.places) ? data.data.places : (Array.isArray(data.data) ? data.data : []);
+            const merged = mode === 'reset' ? places : [...searchPlaces, ...places];
+            setSearchPlaces(merged);
+            setPlacesHasMore(!!data.data.hasNext || places.length === 10);
+            setPlacesPage(prev => mode === 'reset' ? 2 : prev + 1);
+          }
         }
       }
     } catch (e) {
       console.error('장소 목록 조회 실패:', e);
     } finally {
       setPlacesLoading(false);
+    }
+  };
+
+  // 검색 실행 (엔터키 및 버튼)
+  const handleSearchPlaces = () => {
+    setPlacesPage(1);
+    setPlacesHasMore(true);
+    fetchPlaces('reset');
+  };
+
+  // 카테고리 선택 시 즉시 검색
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setPlacesPage(1);
+    setPlacesHasMore(true);
+    setSearchQuery('');
+    setTimeout(() => fetchPlaces('reset'), 0);
+  };
+
+  // 엔터키로 검색
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchPlaces();
     }
   };
 
@@ -115,13 +155,11 @@ function MyRoute() {
     fetchPlaces('reset');
   };
 
-  // (removed) 관심 장소 목록: 전체 장소 검색으로 대체
-
   // 장소 추가 모달 닫기
   const handleCloseAddPlaceModal = () => {
     setShowAddPlaceModal(false);
     setSearchQuery('');
-    setSelectedCategory('전체');
+    setSelectedCategory('관심');
   };
 
   // 루트에 장소 추가
@@ -159,7 +197,7 @@ function MyRoute() {
   const handleShare = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/routes/${routeId}/share`, {
-        method: 'POST',
+        method: 'GET',
         credentials: 'include',
       });
 
@@ -306,7 +344,7 @@ function MyRoute() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/routes/${routeId}/locations/${locationId}/memo`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -315,7 +353,6 @@ function MyRoute() {
       });
 
       if (response.ok) {
-        alert('메모가 저장되었습니다.');
         setActiveMemoId(null);
         setMemoText('');
         // 루트 데이터 새로고침
@@ -355,7 +392,7 @@ function MyRoute() {
     return <div className="myroute-error">루트를 찾을 수 없습니다.</div>;
   }
 
-  // 현재 선택된 날짜의 장소들 (API: locations 기반)
+  // 현재 선택된 날짜의 장소들
   const allLocations = routeData.locations || [];
   const uniqueDays = Array.from(new Set(allLocations.map(l => l.dayNumber))).sort((a,b) => a-b);
   const safeSelectedDay = uniqueDays.length ? selectedDay : 1;
@@ -398,7 +435,7 @@ function MyRoute() {
           <button className="header-icon-btn" onClick={handleShare}>
             <img src={shareIcon} alt="공유" />
           </button>
-          <button className="header-icon-btn" onClick={() => navigate(`/route/${routeId}/edit`)}>
+          <button className="header-icon-btn" onClick={() => console.log('루트 편집')}>
             <img src={editIcon} alt="편집" />
           </button>
           <button className="header-icon-btn" onClick={handleDeleteRoute}>
@@ -410,7 +447,7 @@ function MyRoute() {
       {/* 지도 */}
       <div className="myroute-map-container">
         <GoogleMapContainer 
-          center={mapLocations[0] || { lat: 37.5665, lng: 126.9780 }}
+          center={mapLocations[0]}
           routeLocations={mapLocations}
           activeRouteIndex={activeRouteIndex}
           onRouteMarkerClick={(idx) => setActiveRouteIndex(idx)}
@@ -679,17 +716,17 @@ function MyRoute() {
             {/* 검색 */}
             <div className="search-section">
               <div className="search-input-wrapper">
-                <img src={searchIcon} alt="검색" className="search-icon" />
                 <input 
                   type="text"
-                  placeholder="검색"
+                  placeholder="관광지를 검색해 보세요"
                   value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); }}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
                   className="search-input"
                 />
-              </div>
-              <div className="search-actions">
-                <button className="search-run-btn" onClick={() => { setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}>검색</button>
+                <button className="search-btn" onClick={handleSearchPlaces}>
+                  <img src={searchIcon} alt="검색" />
+                </button>
               </div>
             </div>
 
@@ -698,32 +735,32 @@ function MyRoute() {
               <h3>추천 카테고리</h3>
               <div className="category-grid">
                 <button 
-                  className={`category-item ${selectedCategory === '전체' ? 'selected' : ''}`}
-                  onClick={() => { setSelectedCategory('전체'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                  className={`category-item ${selectedCategory === '관심' ? 'selected' : ''}`}
+                  onClick={() => handleCategorySelect('관심')}
                 >
-                  전체
+                  관심
                 </button>
                 <button 
                   className={`category-item ${selectedCategory === '자연/힐링' ? 'selected' : ''}`}
-                  onClick={() => { setSelectedCategory('자연/힐링'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                  onClick={() => handleCategorySelect('자연/힐링')}
                 >
                   자연/힐링
                 </button>
                 <button 
                   className={`category-item ${selectedCategory === '역사/전통' ? 'selected' : ''}`}
-                  onClick={() => { setSelectedCategory('역사/전통'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                  onClick={() => handleCategorySelect('역사/전통')}
                 >
                   역사/전통
                 </button>
                 <button 
                   className={`category-item ${selectedCategory === '문화/체험' ? 'selected' : ''}`}
-                  onClick={() => { setSelectedCategory('문화/체험'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                  onClick={() => handleCategorySelect('문화/체험')}
                 >
                   문화/체험
                 </button>
                 <button 
                   className={`category-item ${selectedCategory === '식도락' ? 'selected' : ''}`}
-                  onClick={() => { setSelectedCategory('식도락'); setPlacesPage(1); setPlacesHasMore(true); fetchPlaces('reset'); }}
+                  onClick={() => handleCategorySelect('식도락')}
                 >
                   식도락
                 </button>
