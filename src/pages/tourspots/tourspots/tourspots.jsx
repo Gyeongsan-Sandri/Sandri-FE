@@ -268,7 +268,7 @@ const TourSpots = () => {
                 <div className="reviews-section">
                     <div className="reviews-header">
                         <h2 className="section-title">
-                            리뷰 <span className="review-count-badge">{placeData.reviewCount || 3}</span>
+                            리뷰 <span className="review-count-badge">{placeData.totalCount}</span>
                         </h2>
                         <div className="review-filter">
                             <label className="filter-option">

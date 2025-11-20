@@ -820,15 +820,9 @@
   display: flex;
   align-items: center;
   background: #f5f5f5;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 12px 16px;
   gap: 8px;
-}
-
-.search-input-wrapper .search-icon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.5;
 }
 
 .search-input-wrapper .search-input {
@@ -836,7 +830,7 @@
   border: none;
   background: none;
   outline: none;
-  font-size: 15px;
+  font-size: 14px;
   color: #333;
 }
 
@@ -844,20 +838,21 @@
   color: #999;
 }
 
-.search-actions {
+.search-input-wrapper .search-btn {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
   display: flex;
-  justify-content: flex-end;
-  padding-top: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.search-run-btn {
-  border: none;
-  background: #3B82F6;
-  color: #fff;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+.search-input-wrapper .search-btn img {
+  width: 24px;
+  height: 24px;
 }
 
 @keyframes sheetSlideUp {
