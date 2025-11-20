@@ -22,7 +22,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function MyRoute() {
   const { routeId } = useParams();
   const navigate = useNavigate();
-  
+
   const [routeData, setRouteData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(1);
@@ -394,11 +394,11 @@ function MyRoute() {
 
   // 현재 선택된 날짜의 장소들
   const allLocations = routeData.locations || [];
-  const uniqueDays = Array.from(new Set(allLocations.map(l => l.dayNumber))).sort((a,b) => a-b);
+  const uniqueDays = Array.from(new Set(allLocations.map(l => l.dayNumber))).sort((a, b) => a - b);
   const safeSelectedDay = uniqueDays.length ? selectedDay : 1;
   const currentDayPlaces = allLocations
     .filter(loc => loc.dayNumber === safeSelectedDay)
-    .sort((a,b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
   // 지도에 표시할 위치들
   const mapLocations = currentDayPlaces.map(place => ({
@@ -416,11 +416,11 @@ function MyRoute() {
           <button className="back-btn" onClick={handleBack}>
             <img src={backIcon} alt="뒤로가기" />
           </button>
-          
+
           {/* 일행 프로필 */}
           <div className="companions-profiles" onClick={handleOpenCompanionModal}>
             {routeData.participants?.slice(0, 3).map((p, index) => (
-              <img 
+              <img
                 key={p.userId || index}
                 src={defaultProfile}
                 alt={p.userNickname || p.userName || '일행'}
@@ -446,13 +446,13 @@ function MyRoute() {
 
       {/* 지도 */}
       <div className="myroute-map-container">
-        <GoogleMapContainer 
+        <GoogleMapContainer
           center={mapLocations[0]}
           routeLocations={mapLocations}
           activeRouteIndex={activeRouteIndex}
           onRouteMarkerClick={(idx) => setActiveRouteIndex(idx)}
         />
-        
+
         {/* 주변 탐색 버튼 */}
         <button className="explore-nearby-btn">
           <img src={exploreIcon} alt="주변 탐색" className="btn-icon" />
@@ -477,15 +477,15 @@ function MyRoute() {
             <div className="title-row">
               <h1 className="route-title">{routeData.title}</h1>
               <div className="route-visibility">
-                <img 
-                  src={routeData.public ? publicIcon : privateIcon} 
+                <img
+                  src={routeData.public ? publicIcon : privateIcon}
                   alt={routeData.public ? '공개' : '비공개'}
                   className="visibility-icon"
                 />
                 <span>{routeData.public ? '공개' : '비공개'}</span>
               </div>
             </div>
-            
+
             <p className="route-date">
               {routeData.startDate} - {routeData.endDate}
             </p>
@@ -535,22 +535,22 @@ function MyRoute() {
               currentDayPlaces.map((place, index) => (
                 <div key={place.id || index} className="place-item" onClick={() => setActiveRouteIndex(index)}>
                   <div className="place-number">{(place.displayOrder ?? index) + 1}</div>
-                  
+
                   <div className="place-content">
                     <div className="place-image">
-                      <img 
-                        src={place.thumbnailUrl || 'https://via.placeholder.com/80'} 
+                      <img
+                        src={place.thumbnailUrl || 'https://via.placeholder.com/80'}
                         alt={place.name}
                       />
                     </div>
-                    
+
                     <div className="place-info">
                       <h4 className="place-name">{place.name}</h4>
                       <p className="place-address">{place.address}</p>
                     </div>
 
-                    <button 
-                      className="memo-btn" 
+                    <button
+                      className="memo-btn"
                       onClick={() => handleToggleMemo(place.id, place.memo)}
                       title="메모 추가"
                     >
@@ -606,14 +606,14 @@ function MyRoute() {
                 <img src={shareData.qrCodeUrl} alt="QR 코드" className="qr-code" />
               </div>
               <div className="share-link-container">
-                <input 
-                  type="text" 
-                  value={shareData.shareUrl} 
-                  readOnly 
+                <input
+                  type="text"
+                  value={shareData.shareUrl}
+                  readOnly
                   className="share-link-input"
                   onClick={(e) => e.target.select()}
                 />
-                <button 
+                <button
                   className="copy-btn"
                   onClick={() => {
                     navigator.clipboard.writeText(shareData.shareUrl);
@@ -650,8 +650,8 @@ function MyRoute() {
                         className="companion-checkbox"
                       />
                     )}
-                    <img 
-                      src={companion.profileImage || defaultProfile} 
+                    <img
+                      src={companion.profileImage || defaultProfile}
                       alt={companion.nickname}
                       className="companion-avatar"
                     />
@@ -662,14 +662,14 @@ function MyRoute() {
               <div className="companion-actions">
                 {deleteMode ? (
                   <>
-                    <button 
-                      className="cancel-btn" 
+                    <button
+                      className="cancel-btn"
                       onClick={toggleDeleteMode}
                     >
                       취소
                     </button>
-                    <button 
-                      className="delete-confirm-btn" 
+                    <button
+                      className="delete-confirm-btn"
                       onClick={handleDeleteCompanions}
                       disabled={selectedCompanions.length === 0}
                     >
@@ -678,15 +678,15 @@ function MyRoute() {
                   </>
                 ) : (
                   <>
-                    <button 
-                      className="delete-mode-btn" 
+                    <button
+                      className="delete-mode-btn"
                       onClick={toggleDeleteMode}
                     >
                       <img src={trashIcon} alt="삭제" />
                       일행 삭제
                     </button>
-                    <button 
-                      className="add-companion-btn" 
+                    <button
+                      className="add-companion-btn"
                       onClick={() => {
                         const code = prompt('공유 코드를 입력하세요:');
                         if (code) handleAddCompanion(code);
@@ -712,11 +712,11 @@ function MyRoute() {
               <h2>장소 추가</h2>
               <button className="modal-close-btn" onClick={handleCloseAddPlaceModal}>×</button>
             </div>
-            
+
             {/* 검색 */}
             <div className="search-section">
               <div className="search-input-wrapper">
-                <input 
+                <input
                   type="text"
                   placeholder="관광지를 검색해 보세요"
                   value={searchQuery}
@@ -734,31 +734,31 @@ function MyRoute() {
             <div className="category-section">
               <h3>추천 카테고리</h3>
               <div className="category-grid">
-                <button 
+                <button
                   className={`category-item ${selectedCategory === '관심' ? 'selected' : ''}`}
                   onClick={() => handleCategorySelect('관심')}
                 >
                   관심
                 </button>
-                <button 
+                <button
                   className={`category-item ${selectedCategory === '자연/힐링' ? 'selected' : ''}`}
                   onClick={() => handleCategorySelect('자연/힐링')}
                 >
                   자연/힐링
                 </button>
-                <button 
+                <button
                   className={`category-item ${selectedCategory === '역사/전통' ? 'selected' : ''}`}
                   onClick={() => handleCategorySelect('역사/전통')}
                 >
                   역사/전통
                 </button>
-                <button 
+                <button
                   className={`category-item ${selectedCategory === '문화/체험' ? 'selected' : ''}`}
                   onClick={() => handleCategorySelect('문화/체험')}
                 >
                   문화/체험
                 </button>
-                <button 
+                <button
                   className={`category-item ${selectedCategory === '식도락' ? 'selected' : ''}`}
                   onClick={() => handleCategorySelect('식도락')}
                 >
@@ -773,15 +773,15 @@ function MyRoute() {
               <div className="liked-places-grid">
                 {filteredPlaces.length > 0 ? (
                   filteredPlaces.map((place) => (
-                    <div 
-                      key={place.placeId} 
+                    <div
+                      key={place.placeId}
                       className="place-card"
                       onClick={() => handleAddPlaceToRoute(place)}
                     >
                       <div className="place-image">
-                        <img 
-                          src={place.thumbnailUrl || place.officialPhotos?.[0]?.photoUrl || place.photos?.[0]?.photoUrl || 'https://via.placeholder.com/150'} 
-                          alt={place.name} 
+                        <img
+                          src={place.thumbnailUrl || place.officialPhotos?.[0]?.photoUrl || place.photos?.[0]?.photoUrl || 'https://via.placeholder.com/150'}
+                          alt={place.name}
                         />
                       </div>
                       <div className="place-info">
@@ -798,7 +798,7 @@ function MyRoute() {
                 )}
               </div>
               {placesHasMore && (
-                <div className="load-more-container" style={{padding:'12px 0 24px'}}>
+                <div className="load-more-container" style={{ padding: '12px 0 24px' }}>
                   <button className="load-more-btn" onClick={() => fetchPlaces('append')} disabled={placesLoading}>
                     {placesLoading ? '로딩 중...' : '더보기'}
                   </button>

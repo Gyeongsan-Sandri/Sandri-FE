@@ -299,12 +299,20 @@
 .tourspot-card {
   flex: 0 0 auto;
   width: 200px;
+  height: 200px;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tourspot-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
 }
 
 .tourspot-placeholder {
@@ -326,6 +334,9 @@
   font-weight: 600;
   color: var(--text);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 데스크톱 반응형 */
